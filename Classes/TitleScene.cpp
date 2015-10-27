@@ -1,24 +1,36 @@
-#include "HelloWorldScene.h"
+#include "TitleScene.h"
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene()
+Scene* TitleScene::createScene()
 {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
+    Size size = Director::getInstance()->getVisibleSize();
+    
+    FileUtils::getInstance()->addSearchPath("res/");
+    
+    /*
+    auto* titleScene = Sprite::create("title.png");
+    CCLOG("%f %f",titleScene->getContentSize().width,titleScene->getContentSize().height);
+    titleScene->setAnchorPoint(Vec2(0.5,0.5));
+    titleScene->setPosition(size/2);
+     */
     
     auto titleScene = CSLoader::getInstance()->createNode("res/TitleScene.csb");
-    auto textButton = titleScene->getChildByName<cocos2d::ui::Button*>("SButton");
-
-    textButton->setTitleText("AAA");
     
-    Size size = Director::getInstance()->getWinSize();
+    auto* bg = titleScene->getChildByName<Sprite*>("BGTitle");
+    
+    auto* button = titleScene->getChildByName<ui::Button*>("SButton");
+    button->addClickEventListener([](Ref* ref){Director::getInstance()->end(); exit(0);});
+    
+    CCLOG("%f %f",size.width,size.height);
+     
     titleScene->setContentSize(size);
     cocos2d::ui::Helper::doLayout(titleScene);
     
-    // add layer as a child to scene
     scene->addChild(titleScene);
 
     // return the scene
@@ -26,7 +38,7 @@ Scene* HelloWorld::createScene()
 }
 
 // on "init" you need to initialize your instance
-bool HelloWorld::init()
+bool TitleScene::init()
 {
     //////////////////////////////
     // 1. super init first
@@ -43,7 +55,7 @@ bool HelloWorld::init()
 }
 
 
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void TitleScene::menuCloseCallback(Ref* pSender)
 {
     Director::getInstance()->end();
 
