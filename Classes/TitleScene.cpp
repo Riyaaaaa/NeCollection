@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "ui/CocosGUI.h"
+#include "HomeScene.hpp"
 #include "cocostudio/CocoStudio.h"
 
 USING_NS_CC;
@@ -24,7 +25,7 @@ Scene* TitleScene::createScene()
     auto* bg = titleScene->getChildByName<Sprite*>("BGTitle");
     
     auto* button = titleScene->getChildByName<ui::Button*>("SButton");
-    button->addClickEventListener([](Ref* ref){Director::getInstance()->end(); exit(0);});
+    button->addClickEventListener([](Ref* ref){Director::getInstance()->replaceScene(HomeScene::createScene());});
     
     CCLOG("%f %f",size.width,size.height);
      

@@ -76,6 +76,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
      */
 
     register_all_packages();
+    
+    if(UserDefault::getInstance()->getBoolForKey("isFirstLaunching")){
+        if(!initGame())return false;
+    }
 
     // create a scene. it's an autorelease object
     auto scene = TitleScene::createScene();
@@ -101,3 +105,5 @@ void AppDelegate::applicationWillEnterForeground() {
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
+
+bool AppDelegate::initGame(){}
