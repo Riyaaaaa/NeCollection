@@ -7,7 +7,6 @@
         <Image Name="start2.png" />
         <Project Name="TitleScene.csd" Type="Scene" />
         <Image Name="title.png" />
-        <Project Name="HomeScene.csd" Type="Scene" />
         <Folder Name="UI">
           <Image Name="battle.png" />
           <Image Name="dictionary.png" />
@@ -16,15 +15,19 @@
           <Image Name="system.png" />
           <File Name="UIcomponents" />
         </Folder>
-        <Image Name="HomeBG.png" />
         <Folder Name="result">
-          <Image Name="bg12_blue.png" />
-          <Image Name="bg12_green.png" />
-          <Image Name="bg12_violet.png" />
-          <Image Name="bg12_yellow.png" />
           <Project Name="GetResultScene.csd" Type="Scene" />
+          <Image Name="result_base.png" />
         </Folder>
         <Project Name="ShopScene.csd" Type="Scene" />
+        <Folder Name="home">
+          <Image Name="futon.png" />
+          <Image Name="meal.png" />
+          <Image Name="toy.png" />
+          <Image Name="tumetogi.png" />
+          <Project Name="HomeScene.csd" Type="Scene" />
+          <Image Name="HomeBG.png" />
+        </Folder>
       </RootFolder>
     </Group>
   </SolutionFolder>
