@@ -48,11 +48,11 @@ bool HomeScene::init()
     cocos2d::ui::Helper::doLayout(home_scene);
     addChild(home_scene);
     
+    home_bg = home_scene->getChildByName<Sprite*>("home_bg");
+    
     if( !initLayout() || !initStatus()){
         return false;
     }
-    
-    home_bg = home_scene->getChildByName<Sprite*>("home_bg");
     
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(HomeScene::onTouchBegin,this);
@@ -75,13 +75,42 @@ bool HomeScene::initStatus(){
     _cat_objects.resize(4);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]
-        = home_scene->getChildByName<ui::Button*>("toy");
+        = home_bg->getChildByName<ui::Button*>("toy");
+    _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
+        getCat(0);
+        }
+                                                                           );
+    _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
+    
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]
-        = home_scene->getChildByName<ui::Button*>("meal");
+        = home_bg->getChildByName<ui::Button*>("meal");
+    _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->addClickEventListener([&](Ref* ref){
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
+        getCat(0);
+    }
+                                                                            );
+    _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
+    
+    
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]
-        = home_scene->getChildByName<ui::Button*>("futon");
+        = home_bg->getChildByName<ui::Button*>("futon");
+    _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->addClickEventListener([&](Ref* ref){
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
+        getCat(0);
+    }
+                                                                             );
+    _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
+    
+    
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]
-        = home_scene->getChildByName<ui::Button*>("trimmer");
+        = home_bg->getChildByName<ui::Button*>("trimmer");
+    _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->addClickEventListener([&](Ref* ref){
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
+        getCat(0);
+    }
+                                                                               );
+    _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
     
     return true;
 }
@@ -111,16 +140,27 @@ void HomeScene::comeCat(){
         auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
         target->setEnabled(true);
         
-        target->addChild(alert);
-        alert->setPosition(Vec2(target->getContentSize().width,0));
+        target->addChild(alert,1,"alert");
+        alert->setPosition(Vec2(target->getContentSize().width,target->getContentSize().height));
     }
 }
 
 void HomeScene::getCat(int id){
+    Scene* newScene = Scene::create();
     
-    Scene* resultScene = dynamic_cast<Scene*>(CSLoader::getInstance()->createNode("result/ResultScene.csb"));
-    Director::getInstance()->pushScene(resultScene);
+    Node* resultScene = (CSLoader::getInstance()->createNode("result/GetResultScene.csb"));
+    ui::Text* message = resultScene->getChildByName("Window")->getChildByName<ui::Text*>("Message");
     
+    message->setString("ねこが手に入りました");
+    
+    newScene->addChild(resultScene);
+    Director::getInstance()->pushScene(newScene);
+    
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = [&](Touch* touch,Event* event){Director::getInstance()->popScene(); return true;};
+    listener->setSwallowTouches(true);
+    
+    resultScene->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, resultScene);
 }
 
 void HomeScene::saveScheduleTime(){
@@ -152,3 +192,7 @@ void HomeScene::onTouchCancelled(cocos2d::Touch* touch,cocos2d::Event* unused_ev
     onTouchEnded(touch,unused_event);
 }
 
+void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
+    btn->setEnabled(false);
+    btn->getChildByName<Sprite*>("alert")->removeFromParent();
+}

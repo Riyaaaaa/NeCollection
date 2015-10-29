@@ -43,6 +43,8 @@ protected:
     //std::vector<std::unique_ptr<CatObject>> _cat_objects;
     std::vector<cocos2d::ui::Button*> _cat_objects;
     
+    static void disenableCatObject(cocos2d::ui::Button*);
+    
     bool initLayout();
     bool initStatus();
     
@@ -53,7 +55,7 @@ protected:
     
     void saveScheduleTime();
     
-    int _remain_event_time;
+    int _remain_event_time=600;
     cocos2d::Vec2 _old_pos;
     const int OCCURRE_EVENT_TIME = 500;
 };
