@@ -14,12 +14,13 @@
           <Image Name="shop.png" />
           <Image Name="system.png" />
           <File Name="UIcomponents" />
+          <Image Name="window01.png" />
+          <Image Name="money_plate.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
           <Image Name="result_base.png" />
         </Folder>
-        <Project Name="ShopScene.csd" Type="Scene" />
         <Folder Name="home">
           <Image Name="futon.png" />
           <Image Name="meal.png" />
@@ -27,6 +28,19 @@
           <Image Name="tumetogi.png" />
           <Project Name="HomeScene.csd" Type="Scene" />
           <Image Name="HomeBG.png" />
+        </Folder>
+        <Folder Name="fonts">
+          <TTF Name="arial.ttf" />
+          <TTF Name="Candara.ttf" />
+          <TTF Name="Marker Felt.ttf" />
+          <TTF Name="micachan.ttf" />
+        </Folder>
+        <Folder Name="shop">
+          <Image Name="ShopBG.png" />
+          <Project Name="ShopScene.csd" Type="Scene" />
+          <Image Name="shop_container.png" />
+          <Image Name="soldout.png" />
+          <Project Name="ProductsUI.csd" Type="Layer" />
         </Folder>
       </RootFolder>
     </Group>
