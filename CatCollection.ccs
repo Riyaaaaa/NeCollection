@@ -43,6 +43,12 @@
           <Image Name="soldout.png" />
           <Project Name="ProductsUI.csd" Type="Layer" />
           <Image Name="ShopBG.png" />
+          <Image Name="plate.png" />
+        </Folder>
+        <Folder Name="dictionary">
+          <Project Name="VisualScene.csd" Type="Scene" />
+          <Project Name="VisualCat.csd" Type="Layer" />
+          <Image Name="NoImage.png" />
         </Folder>
       </RootFolder>
     </Group>

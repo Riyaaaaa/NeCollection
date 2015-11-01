@@ -82,13 +82,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
         if(!initGame())return false;
     }
 
-    // create a scene. it's an autorelease object
-    //auto scene = TitleScene::createScene();
+    FileUtils::getInstance()->addSearchPath("res/");
+    auto scene = TitleScene::createScene();
 
-    // run
-    //director->runWithScene(scene);
-    
-    dbIO* db = dbIO::getInstance();
+    director->runWithScene(scene);
 
     return true;
 }

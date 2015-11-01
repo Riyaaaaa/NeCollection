@@ -9,6 +9,12 @@
 #ifndef ShopScene_hpp
 #define ShopScene_hpp
 
+#include "ShopScene.hpp"
+#include "ui/CocosGUI.h"
+#include "HomeScene.hpp"
+#include "cocostudio/CocoStudio.h"
+#include "Utility.hpp"
+
 class ShopScene : public cocos2d::Layer
 {
 public:
@@ -18,6 +24,12 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(ShopScene);
+    
+private:
+    bool initUI();
+    void replaceSceneWithName(std::string filename);
+    
+    cocos2d::Node* _shop_scene;
 };
 
 #endif /* ShopScene_hpp */

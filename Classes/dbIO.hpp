@@ -10,6 +10,7 @@
 #define dbIO_hpp
 
 #include "SQLite/sqlite3.h"
+#include "Cat.hpp"
 
 class dbIO{
 public:
@@ -18,7 +19,9 @@ public:
     bool createTable(std::string);
     bool insertTable(std::string);
     
-    bool insertNeco(int id,std::string name,std::string discription);
+    bool insertCat(int id,std::string name,std::string discription);
+    Cat getCatById(int id);
+    std::vector<Cat> getCatAll();
     
     ~dbIO();
     

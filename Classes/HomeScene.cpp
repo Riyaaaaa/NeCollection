@@ -7,7 +7,9 @@
 //
 
 #include "HomeScene.hpp"
+#include "ShopScene.hpp"
 #include "params.h"
+#include "Utility.hpp"
 
 USING_NS_CC;
 
@@ -15,8 +17,6 @@ Scene* HomeScene::createScene()
 {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
-    
-    FileUtils::getInstance()->addSearchPath("res/");
     
     /*
      auto* titleScene = Sprite::create("title.png");
@@ -66,21 +66,24 @@ bool HomeScene::init()
     
     schedule(schedule_selector(HomeScene::update),1.0f);
     
+    _db = dbIO::getInstance();
+    
     return true;
 }
 
 bool HomeScene::initUI(){
     
-    std::function<void(std::string,std::string)> initMenuButton = [&](std::string button,std::string filename){
+    auto initMenuButton = [&](auto* scene,std::string button){
         home_scene->getChildByName("Menu")->
             getChildByName<ui::Button*>(button)->
-                addClickEventListener([&](Ref* ref){
-                        replaceSceneWithName(filename);
+                addClickEventListener([=](Ref* ref){
+                    auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
+                    Director::getInstance()->replaceScene(next_scene);
         });
     };
     
-    initMenuButton("home","home/HomeScene.csb");
-    initMenuButton("shop","shop/ShopScene.csb");
+    initMenuButton( reinterpret_cast<HomeScene*>(0),"home");
+    initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
     //initMenuButton("dictionary","dictionary/DictionaryScene.csb");
     //initMenuButton("battle","battle/BattleScene.csb");
     
@@ -88,7 +91,8 @@ bool HomeScene::initUI(){
 }
 
 void HomeScene::replaceSceneWithName(std::string filename){
-    auto* next_scene = CSLoader::getInstance()->createNode("home/HomeScene.csb");
+    CCLOG("filename = %s",filename.c_str());
+    auto* next_scene = CSLoader::getInstance()->createNode(filename);
     auto* scene = Scene::create();
     
     scene->addChild(next_scene);
@@ -104,7 +108,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("toy");
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
-        getCat(0);
+        getCat(1);
         }
                                                                            );
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
@@ -113,7 +117,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("meal");
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
-        getCat(0);
+        getCat(1);
     }
                                                                             );
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
@@ -123,7 +127,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("futon");
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
-        getCat(0);
+        getCat(1);
     }
                                                                              );
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
@@ -133,7 +137,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("trimmer");
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
-        getCat(0);
+        getCat(1);
     }
                                                                                );
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
@@ -172,12 +176,13 @@ void HomeScene::comeCat(){
 }
 
 void HomeScene::getCat(int id){
+    Cat cat = _db->getCatById(id);
     Scene* newScene = Scene::create();
     
     Node* resultScene = (CSLoader::getInstance()->createNode("result/GetResultScene.csb"));
     ui::Text* message = resultScene->getChildByName("Window")->getChildByName<ui::Text*>("Message");
     
-    message->setString("ねこが手に入りました");
+    message->setString(cat.discription);
     
     newScene->addChild(resultScene);
     Director::getInstance()->pushScene(newScene);
@@ -186,7 +191,7 @@ void HomeScene::getCat(int id){
     listener->onTouchBegan = [&](Touch* touch,Event* event){Director::getInstance()->popScene(); return true;};
     listener->setSwallowTouches(true);
     
-    resultScene->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, resultScene);
+    resultScene->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, message);
 }
 
 void HomeScene::saveScheduleTime(){

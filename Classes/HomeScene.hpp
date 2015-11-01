@@ -13,6 +13,7 @@
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
 #include "CatObject.hpp"
+#include "dbIO.hpp"
 
 class HomeScene : public cocos2d::Layer
 {
@@ -39,6 +40,8 @@ protected:
     
     cocos2d::Node* home_scene;
     cocos2d::Sprite* home_bg;
+    
+    dbIO* _db;
     
     //std::vector<std::unique_ptr<CatObject>> _cat_objects;
     std::vector<cocos2d::ui::Button*> _cat_objects;
