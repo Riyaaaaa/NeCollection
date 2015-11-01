@@ -50,7 +50,7 @@ bool HomeScene::init()
     
     home_bg = home_scene->getChildByName<Sprite*>("home_bg");
     
-    if( !initLayout() || !initStatus()){
+    if( !initUI() || !initStatus()){
         return false;
     }
     
@@ -69,7 +69,33 @@ bool HomeScene::init()
     return true;
 }
 
-bool HomeScene::initLayout(){return true;}
+bool HomeScene::initUI(){
+    
+    std::function<void(std::string,std::string)> initMenuButton = [&](std::string button,std::string filename){
+        home_scene->getChildByName("Menu")->
+            getChildByName<ui::Button*>(button)->
+                addClickEventListener([&](Ref* ref){
+                        replaceSceneWithName(filename);
+        });
+    };
+    
+    initMenuButton("home","home/HomeScene.csb");
+    initMenuButton("shop","shop/ShopScene.csb");
+    //initMenuButton("dictionary","dictionary/DictionaryScene.csb");
+    //initMenuButton("battle","battle/BattleScene.csb");
+    
+    return true;
+}
+
+void HomeScene::replaceSceneWithName(std::string filename){
+    auto* next_scene = CSLoader::getInstance()->createNode("home/HomeScene.csb");
+    auto* scene = Scene::create();
+    
+    scene->addChild(next_scene);
+    
+    Director::getInstance()->replaceScene(scene);
+}
+
 bool HomeScene::initStatus(){
     
     _cat_objects.resize(4);

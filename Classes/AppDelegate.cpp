@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "TitleScene.h"
+#include "dbIO.hpp"
 
 USING_NS_CC;
 
@@ -82,10 +83,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // create a scene. it's an autorelease object
-    auto scene = TitleScene::createScene();
+    //auto scene = TitleScene::createScene();
 
     // run
-    director->runWithScene(scene);
+    //director->runWithScene(scene);
+    
+    dbIO* db = dbIO::getInstance();
 
     return true;
 }

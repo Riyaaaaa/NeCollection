@@ -45,11 +45,13 @@ protected:
     
     static void disenableCatObject(cocos2d::ui::Button*);
     
-    bool initLayout();
     bool initStatus();
+    bool initUI();
     
     void comeCat();
     void getCat(int id);
+    
+    void replaceSceneWithName(std::string);
     
     void update(float dt);
     

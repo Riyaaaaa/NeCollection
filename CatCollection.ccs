@@ -16,6 +16,8 @@
           <File Name="UIcomponents" />
           <Image Name="window01.png" />
           <Image Name="money_plate.png" />
+          <Project Name="MenuUI.csd" Type="Layer" />
+          <Project Name="MoneyUI.csd" Type="Layer" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
@@ -36,11 +38,11 @@
           <TTF Name="micachan.ttf" />
         </Folder>
         <Folder Name="shop">
-          <Image Name="ShopBG.png" />
           <Project Name="ShopScene.csd" Type="Scene" />
           <Image Name="shop_container.png" />
           <Image Name="soldout.png" />
           <Project Name="ProductsUI.csd" Type="Layer" />
+          <Image Name="ShopBG.png" />
         </Folder>
       </RootFolder>
     </Group>
