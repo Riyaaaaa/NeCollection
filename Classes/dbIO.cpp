@@ -8,6 +8,7 @@
 
 #include "dbIO.hpp"
 #include "cocos2d.h"
+#include <iostream>
 
 USING_NS_CC;
 
@@ -77,8 +78,29 @@ Cat dbIO::getCatById(int id){
     return cat;
 }
 
-std::vector<Cat> dbIO::getCatAll(){
+std::string dbIO::getCatNameById(int id){
+    std::string name;
+    std::string sql = "select name from cat";
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
     
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        std::cout << sqlite3_column_int(stmt, 1) << std::endl;
+        //name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return name;
+}
+
+
+std::vector<Cat> dbIO::getCatAll(){
     std::vector<Cat> cat;
     std::string sql = "select * from cat";
     sqlite3_stmt *stmt=nullptr;
@@ -101,6 +123,55 @@ std::vector<Cat> dbIO::getCatAll(){
     return cat;
 }
 
+std::vector<Products> dbIO::getProductAll(){
+    std::vector<Products> list;
+    std::string sql = "select * from products";
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        list.push_back(Products());
+        list.back().id = sqlite3_column_int(stmt, 1);
+        list.back().isObtain = sqlite3_column_int(stmt, 2);
+        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 4));
+        list.back().price = sqlite3_column_int(stmt, 5);
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return list;
+}
+
+std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
+    std::vector<Products> list;
+    std::string sql = "select * from products where type='" + std::to_string(static_cast<int>(type)) + "'";
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        list.push_back(Products());
+        list.back().id = sqlite3_column_int(stmt, 1);
+        list.back().isObtain = sqlite3_column_int(stmt, 2);
+        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 4));
+        list.back().price = sqlite3_column_int(stmt, 5);
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return list;
+}
 
 dbIO::~dbIO(){
     sqlite3_close(useDataBase);

@@ -17,6 +17,7 @@ public:
     CREATE_FUNC(VisualScene);
 private:
     virtual bool init();
+    bool initVisualDictionary();
 };
 
 #endif /* VisualScene_hpp */

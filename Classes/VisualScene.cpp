@@ -12,6 +12,7 @@
 #include "HomeScene.hpp"
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
+#include "params.h"
 
 USING_NS_CC;
 
@@ -40,8 +41,30 @@ bool VisualScene::init(){
         return false;
     }
     
-    if( !initUI() ){
+    if( !initUI() || !initVisualDictionary()){
         return false;
     }
+    return true;
+}
+
+bool VisualScene::initVisualDictionary(){
+    const int CONTENTS_MARGIN = 10;
+    dbIO* db = dbIO::getInstance();
+    
+    cocos2d::Node* dictionary_bg = _scene->getChildByName("DictionaryView");
+    Size visual_size = dictionary_bg->getContentSize();
+    
+    for(int i=0; i<params::NUMBER_OF_CATS;){
+        for(int j=0; j<3 && i<params::NUMBER_OF_CATS ; j++){
+            Sprite* visual_contents = Sprite::create("cat/" + db->getCatById(i).name + ".png");
+            Size contents_size = visual_contents->getContentSize();
+            dictionary_bg->addChild(visual_contents);
+            visual_contents->setAnchorPoint(Vec2(0,1));
+            visual_contents->setPosition((visual_size.width/3) * j + CONTENTS_MARGIN,
+                                         visual_size.height - (contents_size.height + CONTENTS_MARGIN) * (i/3));
+            i++;
+        }
+    }
+    
     return true;
 }

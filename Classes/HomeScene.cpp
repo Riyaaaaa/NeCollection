@@ -8,6 +8,7 @@
 
 #include "HomeScene.hpp"
 #include "ShopScene.hpp"
+#include "VisualScene.hpp"
 #include "params.h"
 #include "Utility.hpp"
 
@@ -84,7 +85,7 @@ bool HomeScene::initUI(){
     
     initMenuButton( reinterpret_cast<HomeScene*>(0),"home");
     initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
-    //initMenuButton("dictionary","dictionary/DictionaryScene.csb");
+    initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
     //initMenuButton("battle","battle/BattleScene.csb");
     
     return true;
@@ -108,7 +109,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("toy");
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
-        getCat(1);
+        getCat(lotteryCat());
         }
                                                                            );
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
@@ -117,7 +118,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("meal");
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
-        getCat(1);
+        getCat(lotteryCat());
     }
                                                                             );
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
@@ -127,7 +128,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("futon");
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
-        getCat(1);
+        getCat(lotteryCat());
     }
                                                                              );
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
@@ -137,7 +138,7 @@ bool HomeScene::initStatus(){
         = home_bg->getChildByName<ui::Button*>("trimmer");
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
-        getCat(1);
+        getCat(lotteryCat());
     }
                                                                                );
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
@@ -184,6 +185,10 @@ void HomeScene::getCat(int id){
     
     message->setString(cat.discription);
     
+    Sprite* sprite = Sprite::create("cat/" + _db->getCatById(id).name + ".png");
+    resultScene->addChild(sprite);
+    sprite->setPosition(Director::getInstance()->getVisibleSize()/2);
+    
     newScene->addChild(resultScene);
     Director::getInstance()->pushScene(newScene);
     
@@ -226,4 +231,12 @@ void HomeScene::onTouchCancelled(cocos2d::Touch* touch,cocos2d::Event* unused_ev
 void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
     btn->setEnabled(false);
     btn->getChildByName<Sprite*>("alert")->removeFromParent();
+}
+
+int HomeScene::lotteryCat(){
+    std::random_device rnd;
+    std::mt19937 mt(rnd());
+    std::uniform_int_distribution<> dist(0,params::NUMBER_OF_CATS);
+    
+    return dist(mt);
 }

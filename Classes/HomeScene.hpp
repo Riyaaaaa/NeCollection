@@ -60,6 +60,8 @@ protected:
     
     void saveScheduleTime();
     
+    int lotteryCat();
+    
     int _remain_event_time=600;
     cocos2d::Vec2 _old_pos;
     const int OCCURRE_EVENT_TIME = 500;

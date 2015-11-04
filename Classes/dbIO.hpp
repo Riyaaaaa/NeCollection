@@ -11,6 +11,7 @@
 
 #include "SQLite/sqlite3.h"
 #include "Cat.hpp"
+#include "Products.hpp"
 
 class dbIO{
 public:
@@ -21,7 +22,11 @@ public:
     
     bool insertCat(int id,std::string name,std::string discription);
     Cat getCatById(int id);
+    std::string getCatNameById(int id);
     std::vector<Cat> getCatAll();
+    
+    std::vector<Products> getProductAll();
+    std::vector<Products> getProductTypeAll(PRODUCTS);
     
     ~dbIO();
     
