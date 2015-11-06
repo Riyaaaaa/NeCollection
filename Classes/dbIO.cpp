@@ -159,11 +159,11 @@ std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
     int r;
     while(SQLITE_ROW == (r=sqlite3_step(stmt))){
         list.push_back(Products());
-        list.back().id = sqlite3_column_int(stmt, 1);
-        list.back().isObtain = sqlite3_column_int(stmt, 2);
-        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 4));
-        list.back().price = sqlite3_column_int(stmt, 5);
+        list.back().id = sqlite3_column_int(stmt, 0);
+        list.back().isObtain = sqlite3_column_int(stmt, 1);
+        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 3));
+        list.back().price = sqlite3_column_int(stmt, 4);
     }
     if(r != SQLITE_DONE){
         CCLOG("SELECT ERROR");

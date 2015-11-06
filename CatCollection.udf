@@ -41,7 +41,7 @@
           <FilePathData Path="dictionary/VisualScene.csd" />
           <FilePathData Path="dictionary/VisualCat.csd" />
         </OpenedDocuments>
-        <ActiveDocument Path="shop/ShopScene.csd" />
+        <ActiveDocument Path="UI/MoneyUI.csd" />
       </Value>
     </Item>
   </Properties>

@@ -44,12 +44,12 @@ bool HomeScene::init()
     
     Size size = Director::getInstance()->getVisibleSize();
     
-    home_scene = CSLoader::getInstance()->createNode("home/HomeScene.csb");
-    home_scene->setContentSize(size);
-    cocos2d::ui::Helper::doLayout(home_scene);
-    addChild(home_scene);
+    _home_scene = CSLoader::getInstance()->createNode("home/HomeScene.csb");
+    _home_scene->setContentSize(size);
+    cocos2d::ui::Helper::doLayout(_home_scene);
+    addChild(_home_scene);
     
-    home_bg = home_scene->getChildByName<Sprite*>("home_bg");
+    _home_bg = _home_scene->getChildByName<Sprite*>("home_bg");
     
     if( !initUI() || !initStatus()){
         return false;
@@ -75,7 +75,7 @@ bool HomeScene::init()
 bool HomeScene::initUI(){
     
     auto initMenuButton = [&](auto* scene,std::string button){
-        home_scene->getChildByName("Menu")->
+        _home_scene->getChildByName("Menu")->
             getChildByName<ui::Button*>(button)->
                 addClickEventListener([=](Ref* ref){
                     auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
@@ -87,6 +87,8 @@ bool HomeScene::initUI(){
     initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
     initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
     //initMenuButton("battle","battle/BattleScene.csb");
+    
+    _home_scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")) + " yen");
     
     return true;
 }
@@ -106,7 +108,7 @@ bool HomeScene::initStatus(){
     _cat_objects.resize(4);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]
-        = home_bg->getChildByName<ui::Button*>("toy");
+        = _home_bg->getChildByName<ui::Button*>("toy");
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
         getCat(lotteryCat());
@@ -115,7 +117,7 @@ bool HomeScene::initStatus(){
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]
-        = home_bg->getChildByName<ui::Button*>("meal");
+        = _home_bg->getChildByName<ui::Button*>("meal");
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
         getCat(lotteryCat());
@@ -125,7 +127,7 @@ bool HomeScene::initStatus(){
     
     
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]
-        = home_bg->getChildByName<ui::Button*>("futon");
+        = _home_bg->getChildByName<ui::Button*>("futon");
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
         getCat(lotteryCat());
@@ -135,7 +137,7 @@ bool HomeScene::initStatus(){
     
     
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]
-        = home_bg->getChildByName<ui::Button*>("trimmer");
+        = _home_bg->getChildByName<ui::Button*>("trimmer");
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->addClickEventListener([&](Ref* ref){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
         getCat(lotteryCat());
@@ -215,10 +217,10 @@ void HomeScene::onTouchMoved(cocos2d::Touch* touch,cocos2d::Event* event){
     Vec2 delta_pos = new_pos - _old_pos;
     _old_pos = new_pos;
     
-    new_pos = home_bg->getPosition() +  Vec2(delta_pos.x,0);
+    new_pos = _home_bg->getPosition() +  Vec2(delta_pos.x,0);
     if(new_pos.x > 520)new_pos.x = 520;
     else if(new_pos.x < 120)new_pos.x = 120;
-    home_bg->setPosition(Vec2(new_pos));
+    _home_bg->setPosition(Vec2(new_pos));
     
 }
 void HomeScene::onTouchEnded(cocos2d::Touch*,cocos2d::Event*){

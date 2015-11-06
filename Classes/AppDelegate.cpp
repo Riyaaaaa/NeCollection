@@ -78,10 +78,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     register_all_packages();
     
-    if(UserDefault::getInstance()->getBoolForKey("isFirstLaunching")){
+    if(!UserDefault::getInstance()->getBoolForKey("haveEverLaunched")){
         if(!initGame())return false;
     }
-
+    
     FileUtils::getInstance()->addSearchPath("res/");
     auto scene = TitleScene::createScene();
 
@@ -106,4 +106,7 @@ void AppDelegate::applicationWillEnterForeground() {
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
 
-bool AppDelegate::initGame(){}
+bool AppDelegate::initGame(){
+    UserDefault::getInstance()->setIntegerForKey("money", 500);
+    return true;
+}

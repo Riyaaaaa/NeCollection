@@ -38,13 +38,19 @@ private:
     void setProducts(PRODUCTS);
     void replaceSceneWithName(std::string filename);
     
+    cocos2d::Node* createProducts(Products);
+    
     enum ZORDER{
         UI=2
     };
     
+    int _current_produts;
+    
     const float LINEUP_HEIGHT = 300;
     
     cocos2d::Node* _shop_scene;
+    cocos2d::Sprite* _left_arrow=nullptr;
+    cocos2d::Sprite* _right_arrow=nullptr;
     
     std::vector<Node*> _lineup_products;
     int  _number_of_lineup_products;

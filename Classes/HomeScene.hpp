@@ -38,8 +38,8 @@ protected:
         TRIMMER
     };
     
-    cocos2d::Node* home_scene;
-    cocos2d::Sprite* home_bg;
+    cocos2d::Node* _home_scene;
+    cocos2d::Sprite* _home_bg;
     
     dbIO* _db;
     
