@@ -12,6 +12,9 @@
 #include<string>
 
 struct Cat{
+    static std::string neko_id_to_string(int id){
+        return "cat/neko" + ((id < 10) ? "0" + std::to_string(id) : std::to_string(id)) + ".jpg";
+    }
     int id;
     std::string name,discription;
 };

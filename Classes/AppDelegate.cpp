@@ -1,6 +1,9 @@
 #include "AppDelegate.h"
 #include "TitleScene.h"
+#include "UserData.hpp"
 #include "dbIO.hpp"
+#include <fstream>
+#include <iostream>
 
 USING_NS_CC;
 
@@ -107,6 +110,17 @@ void AppDelegate::applicationWillEnterForeground() {
 }
 
 bool AppDelegate::initGame(){
+    std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
     UserDefault::getInstance()->setIntegerForKey("money", 500);
+    CCLOG("%s",(filepath + "cat_box.csv").c_str());
+    std::ofstream ofs(filepath + "cat_box.csv",std::ios::trunc);
+    if(!ofs.is_open()){
+        std::cout << "cant open cat_box.csv" << std::endl;
+        return false;
+    }
+    UserData::getInstance()->setMoney(500);
+    
+    /* initialize to debug*/
+    dbIO::getInstance()->queryTable("update products set isObtain = 0;");
     return true;
 }

@@ -35,16 +35,23 @@ public:
     
 private:
     bool initUI();
+    bool buyProducts(cocos2d::Touch*,cocos2d::Event*);
     void setProducts(PRODUCTS);
     void replaceSceneWithName(std::string filename);
+    void setBuyEvent(Node* container, int id);
+    void soldOut(cocos2d::Node* container);
+    
+    void refreshScreen();
     
     cocos2d::Node* createProducts(Products);
     
     enum ZORDER{
-        UI=2
+        UI=2,
+        MODAL_LAYER=3,
+        MODAL_WINDOW=4
     };
     
-    int _current_produts;
+    int _current_products;
     
     const float LINEUP_HEIGHT = 300;
     
@@ -53,6 +60,7 @@ private:
     cocos2d::Sprite* _right_arrow=nullptr;
     
     std::vector<Node*> _lineup_products;
+    std::vector<Products> _products_list;
     int  _number_of_lineup_products;
 };
 

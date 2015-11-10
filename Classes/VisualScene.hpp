@@ -11,7 +11,7 @@
 
 #include "MainScene.h"
 
-class VisualScene : cocos2d::Layer,MainScene{
+class VisualScene : public MainScene{
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(VisualScene);

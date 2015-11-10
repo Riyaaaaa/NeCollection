@@ -20,13 +20,18 @@ public:
     bool createTable(std::string);
     bool insertTable(std::string);
     
+    bool queryTable(std::string);
+    
+    /* query to cat table */
     bool insertCat(int id,std::string name,std::string discription);
     Cat getCatById(int id);
     std::string getCatNameById(int id);
     std::vector<Cat> getCatAll();
     
+    /* query to product table*/
     std::vector<Products> getProductAll();
     std::vector<Products> getProductTypeAll(PRODUCTS);
+    bool getProdubtIsObtain(int);
     
     ~dbIO();
     

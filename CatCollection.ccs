@@ -44,12 +44,16 @@
           <Project Name="ProductsUI.csd" Type="Layer" />
           <Image Name="ShopBG.png" />
           <Image Name="plate.png" />
+          <Project Name="Buy_Window.csd" Type="Layer" />
+          <Image Name="BuyBG.png" />
         </Folder>
         <Folder Name="dictionary">
           <Project Name="VisualScene.csd" Type="Scene" />
           <Project Name="VisualCat.csd" Type="Layer" />
           <Image Name="NoImage.png" />
         </Folder>
+        <Image Name="no.png" />
+        <Image Name="yes.png" />
       </RootFolder>
     </Group>
   </SolutionFolder>

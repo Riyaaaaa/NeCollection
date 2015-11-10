@@ -22,4 +22,5 @@ struct remove_ptr<T*>{
 template<typename T>
 using remove_ptr_t = typename remove_ptr<T>::type;
 
+
 #endif /* Utility_h */

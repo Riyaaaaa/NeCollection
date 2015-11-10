@@ -11,6 +11,8 @@
 #include "VisualScene.hpp"
 #include "params.h"
 #include "Utility.hpp"
+#include "UserData.hpp"
+#include "Cat.hpp"
 
 USING_NS_CC;
 
@@ -88,7 +90,7 @@ bool HomeScene::initUI(){
     initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
     //initMenuButton("battle","battle/BattleScene.csb");
     
-    _home_scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")) + " yen");
+    _home_scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")));
     
     return true;
 }
@@ -187,7 +189,7 @@ void HomeScene::getCat(int id){
     
     message->setString(cat.discription);
     
-    Sprite* sprite = Sprite::create("cat/" + _db->getCatById(id).name + ".png");
+    Sprite* sprite = Sprite::create(Cat::neko_id_to_string(id));
     resultScene->addChild(sprite);
     sprite->setPosition(Director::getInstance()->getVisibleSize()/2);
     
@@ -199,6 +201,8 @@ void HomeScene::getCat(int id){
     listener->setSwallowTouches(true);
     
     resultScene->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, message);
+    
+    UserData::getInstance()->addCats(id);
 }
 
 void HomeScene::saveScheduleTime(){

@@ -13,6 +13,7 @@
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
 #include "params.h"
+#include "Cat.hpp"
 
 USING_NS_CC;
 
@@ -36,7 +37,7 @@ bool VisualScene::init(){
     cocos2d::ui::Helper::doLayout(_scene);
     addChild(_scene);
     
-    if ( !Layer::init() )
+    if ( !MainScene::init() )
     {
         return false;
     }
@@ -56,7 +57,8 @@ bool VisualScene::initVisualDictionary(){
     
     for(int i=0; i<params::NUMBER_OF_CATS;){
         for(int j=0; j<3 && i<params::NUMBER_OF_CATS ; j++){
-            Sprite* visual_contents = Sprite::create("cat/" + db->getCatById(i).name + ".png");
+            auto file_path = Cat::neko_id_to_string(i);
+            Sprite* visual_contents = Sprite::create(file_path);
             Size contents_size = visual_contents->getContentSize();
             dictionary_bg->addChild(visual_contents);
             visual_contents->setAnchorPoint(Vec2(0,1));

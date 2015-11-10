@@ -55,6 +55,18 @@ bool dbIO::insertTable(std::string){
     return true;
 }
 
+bool dbIO::queryTable(std::string str){
+    int status;
+    auto sql = str;
+    status = sqlite3_exec(useDataBase, sql.c_str() , NULL, NULL, &errorMessage);
+    if( status != SQLITE_OK ){
+        CCLOG("query failed : %s \n query details: %s", errorMessage, str.c_str());
+        return false;
+    }
+    return true;
+}
+
+
 Cat dbIO::getCatById(int id){
     
     Cat cat;
@@ -171,6 +183,27 @@ std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
     
     sqlite3_finalize(stmt);
     return list;
+}
+
+bool dbIO::getProdubtIsObtain(int id){
+    bool isObtain;
+    std::string sql = "select isObtain from products where id='" + std::to_string(id) + "'";
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        isObtain = sqlite3_column_int(stmt, 0);
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+
+    return isObtain;
 }
 
 dbIO::~dbIO(){

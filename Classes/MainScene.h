@@ -11,7 +11,9 @@
 
 #include "cocos2d.h"
 
-class MainScene{
+class MainScene: public cocos2d::Layer{
+public:
+    bool init();
 protected:
     bool initUI();
     cocos2d::Node* _scene;

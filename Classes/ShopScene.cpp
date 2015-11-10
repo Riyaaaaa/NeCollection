@@ -10,6 +10,7 @@
 #include "VisualScene.hpp"
 #include "ui/CocosGUI.h"
 #include "HomeScene.hpp"
+#include "UserData.hpp"
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
 
@@ -85,7 +86,7 @@ bool ShopScene::initUI(){
     ui_layer->getChildByName<ui::Button*>("futon")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::FUTON);});
     ui_layer->getChildByName<ui::Button*>("trimmer")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TRIMMER);});
     
-    _shop_scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")) + " yen");
+    refreshScreen();
     
     return true;
 }
@@ -102,7 +103,6 @@ void ShopScene::replaceSceneWithName(std::string filename){
 void ShopScene::setProducts(PRODUCTS identify){
     Size visibleSize = Director::getInstance()->getVisibleSize();
     dbIO* db = dbIO::getInstance();
-    std::vector<Products> products_list;
     
     for(Node* product : _lineup_products){
         product->removeFromParent();
@@ -110,13 +110,13 @@ void ShopScene::setProducts(PRODUCTS identify){
     }
     _lineup_products.clear();
     
-    products_list = db->getProductTypeAll(identify);
+    _products_list = db->getProductTypeAll(identify);
     
-    _number_of_lineup_products = products_list.size();
-    _current_produts = 0;
+    _number_of_lineup_products = _products_list.size();
+    _current_products = 0;
     
-    for(long i=0; i<products_list.size(); i++){
-        _lineup_products.push_back(createProducts(products_list[i]));
+    for(long i=0; i<_products_list.size(); i++){
+        _lineup_products.push_back(createProducts(_products_list[i]));
         _lineup_products[i]->setAnchorPoint(Vec2(0.5,0.5));
     }
     
@@ -124,6 +124,8 @@ void ShopScene::setProducts(PRODUCTS identify){
         addChild(_lineup_products[i]);
         _lineup_products[i]->setPosition(Vec2((Director::getInstance()->getVisibleSize().width/2)*(i+1),LINEUP_HEIGHT));
     }
+    
+    setBuyEvent(_lineup_products[_current_products], _products_list[_current_products].id);
     
     if(!_right_arrow && !_left_arrow){
         _right_arrow = Sprite::create("utility/utility_ui.png",
@@ -146,8 +148,69 @@ Node* ShopScene::createProducts(Products products){
     auto image = products_container->getChildByName<ui::ImageView*>("ProductImg");
     image->loadTexture("products/" + products.name + ".png");
     products_container->getChildByName<ui::Text*>("price")->setText(std::to_string(products.price)+" yen");
+    
+    if(products.isObtain){
+        Sprite* soldout = Sprite::create("UI/soldout.png");
+        products_container->addChild(soldout);
+        soldout->setPosition( products_container->getContentSize() / 2 );
+    }
+    
     products_container->retain();
     return products_container;
+}
+
+void ShopScene::setBuyEvent(cocos2d::Node *container, int id){
+    bool isObtain = dbIO::getInstance()->getProdubtIsObtain(id);
+    
+    if(!isObtain && UserData::getInstance()->getMoney() >= _products_list[_current_products].price){
+        auto listener = EventListenerTouchOneByOne::create();
+        listener->onTouchBegan = CC_CALLBACK_2(ShopScene::buyProducts,this);
+        listener->setSwallowTouches(true);
+        container->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, container);
+    }
+}
+
+bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
+    int money = UserData::getInstance()->getMoney();
+    
+    if(_lineup_products[_current_products]->getBoundingBox().containsPoint(touch->getLocation())){
+        Layer* modal_layer = LayerColor::create( Color4B(0,0,0,128) );
+        addChild(modal_layer,MODAL_LAYER,"modal_layer");
+        
+        Node* modal_window = CSLoader::getInstance()->createNode("shop/Buy_Window.csb");
+        modal_layer->addChild(modal_window);
+        
+        modal_window->setAnchorPoint(Vec2(0.5,0.5));
+        modal_window->setPosition(modal_layer->getContentSize()/2);
+        
+        modal_window->getChildByName<ui::Text*>("before_money")->setString(std::to_string(money));
+        modal_window->getChildByName<ui::Text*>("after_money")->setString(std::to_string(money - _products_list[_current_products].price));
+        
+        modal_window->getChildByName<ui::Button*>("no")->addClickEventListener([=](Ref* ref){modal_layer->removeFromParent();});
+        
+        modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
+            this->soldOut(_lineup_products[_current_products]);
+            dbIO::getInstance()->queryTable("update products set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
+            UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
+            modal_layer->removeFromParent();
+            this->refreshScreen();
+        });
+        
+        auto listner = EventListenerTouchOneByOne::create();
+        listner->setSwallowTouches(true);
+        listner->onTouchBegan = [](Touch*,Event*){return true;};
+        
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(listner,modal_layer);
+        
+        return true;
+    }
+    return false;
+}
+
+void ShopScene::soldOut(Node* container){
+    Sprite* soldout = Sprite::create("UI/soldout.png");
+    container->addChild(soldout);
+    soldout->setPosition( container->getContentSize() / 2 );
 }
 
 bool ShopScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
@@ -158,57 +221,67 @@ bool ShopScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
     
     if(_lineup_products.size() == 0)return false;
     
+    _eventDispatcher->removeEventListenersForTarget(_lineup_products[_current_products]);
+    
     if(pos.y < LINEUP_HEIGHT*1.5f){
         if(pos.x > size.width/2){
             //lineup move right
-            if(_current_produts < _lineup_products.size()-1){
-                if(_current_produts!=0)animations.pushBack(TargetedAction::create(_lineup_products[_current_produts - 1],MoveTo::create(0.5f,Vec2(-size.width/2,LINEUP_HEIGHT))));
-                animations.pushBack(TargetedAction::create(_lineup_products[_current_produts],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
+            if(_current_products < _lineup_products.size()-1){
+                if(_current_products!=0)animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 1],MoveTo::create(0.5f,Vec2(-size.width/2,LINEUP_HEIGHT))));
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
                 auto remove = RemoveSelf::create();
-                remove->setTarget(_lineup_products[_current_produts + 1]);
-                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_produts + 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
+                remove->setTarget(_lineup_products[_current_products + 1]);
+                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_products + 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
                 
-                if(_current_produts < _lineup_products.size() - 2){
-                    addChild(_lineup_products[_current_produts + 2]);
-                    _lineup_products[_current_produts + 2],setPosition(Vec2(size.width*1.5f,LINEUP_HEIGHT));
-                    animations.pushBack(TargetedAction::create(_lineup_products[_current_produts + 2],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
+                if(_current_products < _lineup_products.size() - 2){
+                    addChild(_lineup_products[_current_products + 2]);
+                    _lineup_products[_current_products + 2],setPosition(Vec2(size.width*1.5f,LINEUP_HEIGHT));
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 2],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
                 }
                 
                 runAction(Spawn::create(animations));
-                _current_produts++;
+                _current_products++;
                 
             }
             
         }
         else {
             //lineup move left
-            if(_current_produts > 0){
-                if(_current_produts != _lineup_products.size()-1)animations.pushBack(TargetedAction::create(_lineup_products[_current_produts + 1],MoveTo::create(0.5f,Vec2(size.width*1.5f,LINEUP_HEIGHT))));
-                animations.pushBack(TargetedAction::create(_lineup_products[_current_produts],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
-                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_produts - 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
+            if(_current_products > 0){
+                if(_current_products != _lineup_products.size()-1)animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 1],MoveTo::create(0.5f,Vec2(size.width*1.5f,LINEUP_HEIGHT))));
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
+                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_products - 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
                 
-                if(_current_produts > 1){
-                    addChild(_lineup_products[_current_produts - 2]);
-                    _lineup_products[_current_produts - 2],setPosition(Vec2(-size.width/2,LINEUP_HEIGHT));
-                    animations.pushBack(TargetedAction::create(_lineup_products[_current_produts - 2],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
+                if(_current_products > 1){
+                    addChild(_lineup_products[_current_products - 2]);
+                    _lineup_products[_current_products - 2],setPosition(Vec2(-size.width/2,LINEUP_HEIGHT));
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 2],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
                 }
                 
                 runAction(Spawn::create(animations));
-                _current_produts--;
+                _current_products--;
             }
             
         }
         
-        if(_current_produts == 0)_right_arrow->setVisible(false);
+        setBuyEvent(_lineup_products[_current_products], _products_list[_current_products].id);
+        
+        if(_current_products == 0)_right_arrow->setVisible(false);
         else _right_arrow->setVisible(true);
         
-        if(_current_produts == _lineup_products.size()-1)_left_arrow->setVisible(false);
+        if(_current_products == _lineup_products.size()-1)_left_arrow->setVisible(false);
         else _left_arrow->setVisible(true);
         
         return true;
     }
     
     return false;
+}
+
+void ShopScene::refreshScreen(){
+    int money = UserData::getInstance()->getMoney();
+    _shop_scene->getChildByName("MoneyUI")->getChildByName("money_plate")
+        ->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
 }
 
 ShopScene::~ShopScene(){

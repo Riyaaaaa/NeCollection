@@ -34,3 +34,10 @@ bool MainScene::initUI(){
     
     return true;
 }
+
+bool MainScene::init(){
+    if ( !MainScene::init() )
+    {
+        return false;
+    }
+}
