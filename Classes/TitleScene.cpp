@@ -2,6 +2,7 @@
 #include "ui/CocosGUI.h"
 #include "HomeScene.hpp"
 #include "cocostudio/CocoStudio.h"
+#include "AppDelegate.h"
 
 USING_NS_CC;
 
@@ -22,10 +23,10 @@ Scene* TitleScene::createScene()
     
     auto titleScene = CSLoader::getInstance()->createNode("res/TitleScene.csb");
     
-    auto* bg = titleScene->getChildByName<Sprite*>("BGTitle");
-    
     auto* button = titleScene->getChildByName<ui::Button*>("SButton");
-    button->addClickEventListener([](Ref* ref){Director::getInstance()->replaceScene(HomeScene::createScene());});
+    button->addClickEventListener([](Ref* ref){
+        ((AppDelegate*)Application::getInstance())->launchGame();
+    });
     
     CCLOG("%f %f",size.width,size.height);
      

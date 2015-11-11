@@ -16,6 +16,11 @@ public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(VisualScene);
 private:
+    
+    enum ZOrder{
+        SCENE=0
+    };
+    
     virtual bool init();
     bool initVisualDictionary();
 };

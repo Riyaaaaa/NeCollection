@@ -13,14 +13,18 @@
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
 #include "CatObject.hpp"
+#include "MainScene.h"
 #include "dbIO.hpp"
 
-class HomeScene : public cocos2d::Layer
+class HomeScene : public MainScene
 {
 public:
     static cocos2d::Scene* createScene();
+    void refreshScene();
     
     virtual bool init();
+    
+    ~HomeScene();
     
     // implement the "static create()" method manually
     CREATE_FUNC(HomeScene);
@@ -30,6 +34,8 @@ public:
     void onTouchEnded(cocos2d::Touch*,cocos2d::Event*);
     void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
     
+    void saveScheduleTime();
+    
 protected:
     enum class CAT_OBJECT{
         TOY=0,
@@ -38,7 +44,10 @@ protected:
         TRIMMER
     };
     
-    cocos2d::Node* _home_scene;
+    enum ZOrder{
+        SCENE=0
+    };
+
     cocos2d::Sprite* _home_bg;
     
     dbIO* _db;
@@ -47,6 +56,8 @@ protected:
     std::vector<cocos2d::ui::Button*> _cat_objects;
     
     static void disenableCatObject(cocos2d::ui::Button*);
+    void enableCatObject(cocos2d::ui::Button*);
+    
     
     bool initStatus();
     bool initUI();
@@ -57,8 +68,6 @@ protected:
     void replaceSceneWithName(std::string);
     
     void update(float dt);
-    
-    void saveScheduleTime();
     
     int lotteryCat();
     

@@ -22,7 +22,7 @@ Scene* ShopScene::createScene()
     auto scene = Scene::create();
     Size size = Director::getInstance()->getVisibleSize();
     
-    scene->addChild(ShopScene::create());
+    scene->addChild(ShopScene::create(),SCENE,"ShopScene");
     
     // return the scene
     return scene;
@@ -31,17 +31,8 @@ Scene* ShopScene::createScene()
 // on "init" you need to initialize your instance
 bool ShopScene::init()
 {
-    //////////////////////////////
-    // 1. super init first
     
-    _shop_scene = CSLoader::getInstance()->createNode("shop/ShopScene.csb");
-    Size size = Director::getInstance()->getVisibleSize();
-    
-    _shop_scene->setContentSize(size);
-    cocos2d::ui::Helper::doLayout(_shop_scene);
-    addChild(_shop_scene);
-    
-    if ( !Layer::init() )
+    if ( !MainScene::init("shop/ShopScene.csb") )
     {
         return false;
     }
@@ -65,7 +56,7 @@ bool ShopScene::init()
 
 bool ShopScene::initUI(){
     auto initMenuButton = [&](auto* scene,std::string button){
-        _shop_scene->getChildByName("Menu")->
+        _scene->getChildByName("Menu")->
         getChildByName<ui::Button*>(button)->
         addClickEventListener([=](Ref* ref){
             auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
@@ -79,7 +70,7 @@ bool ShopScene::initUI(){
     initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
     //initMenuButton("battle","battle/BattleScene.csb");
     
-    auto ui_layer = _shop_scene->getChildByName("ProductsTopMenu");
+    auto ui_layer = _scene->getChildByName("ProductsTopMenu");
     
     ui_layer->getChildByName<ui::Button*>("meal")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::MEAL);});
     ui_layer->getChildByName<ui::Button*>("toy")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TOY);});
@@ -280,7 +271,7 @@ bool ShopScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
 
 void ShopScene::refreshScreen(){
     int money = UserData::getInstance()->getMoney();
-    _shop_scene->getChildByName("MoneyUI")->getChildByName("money_plate")
+    _scene->getChildByName("MoneyUI")->getChildByName("money_plate")
         ->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
 }
 

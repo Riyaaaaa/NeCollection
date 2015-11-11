@@ -16,8 +16,9 @@
 #include "Utility.hpp"
 #include "params.h"
 #include "Products.hpp"
+#include "MainScene.h"
 
-class ShopScene : public cocos2d::Layer
+class ShopScene : public MainScene
 {
 public:
     static cocos2d::Scene* createScene();
@@ -46,6 +47,7 @@ private:
     cocos2d::Node* createProducts(Products);
     
     enum ZORDER{
+        SCENE=0,
         UI=2,
         MODAL_LAYER=3,
         MODAL_WINDOW=4
@@ -55,7 +57,6 @@ private:
     
     const float LINEUP_HEIGHT = 300;
     
-    cocos2d::Node* _shop_scene;
     cocos2d::Sprite* _left_arrow=nullptr;
     cocos2d::Sprite* _right_arrow=nullptr;
     

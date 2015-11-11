@@ -28,5 +28,16 @@
         <EnableHTML5Advanced Value="False" />
       </Value>
     </Item>
+    <Item Key="TabsParamsKey">
+      <Value ctype="TabsInfo">
+        <OpenedDocuments>
+          <FilePathData Path="shop/Buy_Window.csd" />
+          <FilePathData Path="shop/ProductsUI.csd" />
+          <FilePathData Path="shop/ShopScene.csd" />
+          <FilePathData Path="UI/MoneyUI.csd" />
+        </OpenedDocuments>
+        <ActiveDocument Path="shop/Buy_Window.csd" />
+      </Value>
+    </Item>
   </Properties>
 </UserData>

@@ -13,6 +13,7 @@
 #include "Utility.hpp"
 #include "UserData.hpp"
 #include "Cat.hpp"
+#include <ctime>
 
 USING_NS_CC;
 
@@ -28,7 +29,7 @@ Scene* HomeScene::createScene()
      titleScene->setPosition(size/2);
      */
     
-    scene->addChild(HomeScene::create());
+    scene->addChild(HomeScene::create(),SCENE,"HomeScene");
     
     // return the scene
     return scene;
@@ -37,23 +38,14 @@ Scene* HomeScene::createScene()
 
 bool HomeScene::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !Layer::init() )
+    if ( !MainScene::init("home/HomeScene.csb") )
     {
         return false;
     }
     
-    Size size = Director::getInstance()->getVisibleSize();
+    _home_bg = _scene->getChildByName<Sprite*>("home_bg");
     
-    _home_scene = CSLoader::getInstance()->createNode("home/HomeScene.csb");
-    _home_scene->setContentSize(size);
-    cocos2d::ui::Helper::doLayout(_home_scene);
-    addChild(_home_scene);
-    
-    _home_bg = _home_scene->getChildByName<Sprite*>("home_bg");
-    
-    if( !initUI() || !initStatus()){
+    if(!initUI() || !initStatus()){
         return false;
     }
     
@@ -64,33 +56,20 @@ bool HomeScene::init()
     listener->onTouchCancelled = CC_CALLBACK_2(HomeScene::onTouchCancelled,this);
     
     listener->setSwallowTouches(true);
-    
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
     schedule(schedule_selector(HomeScene::update),1.0f);
     
     _db = dbIO::getInstance();
     
+    refreshScene();
+    
     return true;
 }
 
 bool HomeScene::initUI(){
     
-    auto initMenuButton = [&](auto* scene,std::string button){
-        _home_scene->getChildByName("Menu")->
-            getChildByName<ui::Button*>(button)->
-                addClickEventListener([=](Ref* ref){
-                    auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
-                    Director::getInstance()->replaceScene(next_scene);
-        });
-    };
-    
-    initMenuButton( reinterpret_cast<HomeScene*>(0),"home");
-    initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
-    initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
-    //initMenuButton("battle","battle/BattleScene.csb");
-    
-    _home_scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")));
+    _scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")));
     
     return true;
 }
@@ -106,9 +85,10 @@ void HomeScene::replaceSceneWithName(std::string filename){
 }
 
 bool HomeScene::initStatus(){
+    auto* tiny_data = UserDefault::getInstance();
     
     _cat_objects.resize(4);
-    
+
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]
         = _home_bg->getChildByName<ui::Button*>("toy");
     _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
@@ -116,7 +96,10 @@ bool HomeScene::initStatus(){
         getCat(lotteryCat());
         }
                                                                            );
-    _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
+    if(tiny_data->getBoolForKey("isCommingToy"))
+        _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(true);
+    else
+        _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]
         = _home_bg->getChildByName<ui::Button*>("meal");
@@ -125,8 +108,10 @@ bool HomeScene::initStatus(){
         getCat(lotteryCat());
     }
                                                                             );
-    _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
-    
+    if(tiny_data->getBoolForKey("isCommingMeal"))
+        _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(true);
+    else
+        _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]
         = _home_bg->getChildByName<ui::Button*>("futon");
@@ -135,7 +120,10 @@ bool HomeScene::initStatus(){
         getCat(lotteryCat());
     }
                                                                              );
-    _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
+    if(tiny_data->getBoolForKey("isCommingFuton"))
+        _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(true);
+    else
+        _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
     
     
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]
@@ -144,8 +132,12 @@ bool HomeScene::initStatus(){
         disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
         getCat(lotteryCat());
     }
+                                                                               
                                                                                );
-    _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
+    if(tiny_data->getBoolForKey("isCommingTrimmer"))
+        _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(true);
+    else
+        _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
     
     return true;
 }
@@ -172,12 +164,21 @@ void HomeScene::comeCat(){
     auto* target = _cat_objects[static_cast<int>(index)];
     
     if(!target->isEnabled()){
-        auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
-        target->setEnabled(true);
-        
-        target->addChild(alert,1,"alert");
-        alert->setPosition(Vec2(target->getContentSize().width,target->getContentSize().height));
+        enableCatObject(target);
     }
+}
+
+void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
+    btn->setEnabled(false);
+    btn->getChildByName<Sprite*>("alert")->removeFromParent();
+}
+
+void HomeScene::enableCatObject(ui::Button* btn){
+    auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+    btn->setEnabled(true);
+    btn->addChild(alert,1,"alert");
+    
+    alert->setPosition(Vec2(btn->getContentSize().width,btn->getContentSize().height));
 }
 
 void HomeScene::getCat(int id){
@@ -207,9 +208,18 @@ void HomeScene::getCat(int id){
 
 void HomeScene::saveScheduleTime(){
     auto* tiny_data = UserDefault::getInstance();
+    std::time_t timer;
+    struct std::tm *t_st;
     
+    std::time(&timer);
+    t_st = localtime(&timer);
+    int previous_time = t_st->tm_sec + t_st->tm_min * 60 + t_st->tm_hour * 3600;
+    CCLOG("previous time = %d",previous_time);
+    
+    tiny_data->setIntegerForKey("previous_time", previous_time);
     tiny_data->setIntegerForKey("time",_remain_event_time);
 }
+
 
 bool HomeScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
     _old_pos = touch->getLocation();
@@ -234,15 +244,29 @@ void HomeScene::onTouchCancelled(cocos2d::Touch* touch,cocos2d::Event* unused_ev
     onTouchEnded(touch,unused_event);
 }
 
-void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
-    btn->setEnabled(false);
-    btn->getChildByName<Sprite*>("alert")->removeFromParent();
-}
-
 int HomeScene::lotteryCat(){
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::uniform_int_distribution<> dist(0,params::NUMBER_OF_CATS);
     
     return dist(mt);
+}
+
+void HomeScene::refreshScene(){
+    auto* tiny_data = UserDefault::getInstance();
+    std::time_t timer;
+    struct std::tm *t_st;
+    
+    std::time(&timer);
+    t_st = localtime(&timer);
+    int current_time = t_st->tm_sec + t_st->tm_min * 60 + t_st->tm_hour * 3600;
+    int elapsed_time = current_time - tiny_data->getIntegerForKey("previous_time");
+    CCLOG("elapsed time = %d",elapsed_time);
+    
+    tiny_data->setIntegerForKey("previous_time", current_time);
+    _remain_event_time = tiny_data->getIntegerForKey("time") + elapsed_time;
+}
+
+HomeScene::~HomeScene(){
+    saveScheduleTime();
 }

@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "TitleScene.h"
+#include "HomeScene.hpp"
 #include "UserData.hpp"
 #include "dbIO.hpp"
 #include <fstream>
@@ -12,7 +13,7 @@ static cocos2d::Size smallResolutionSize = cocos2d::Size(640, 1136);
 static cocos2d::Size mediumResolutionSize = cocos2d::Size(1024, 768);
 static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
 
-AppDelegate::AppDelegate() {
+AppDelegate::AppDelegate() :_home_scene(nullptr){
 
 }
 
@@ -95,23 +96,54 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void AppDelegate::applicationDidEnterBackground() {
+    
+    auto* running_scene = Director::getInstance()->getRunningScene()->getChildren().at(1);
+    if(running_scene->getName() == "HomeScene"){
+        dynamic_cast<HomeScene*>(running_scene)->saveScheduleTime();
+    }
+    
     Director::getInstance()->stopAnimation();
-
+    
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }
 
+void AppDelegate::launchGame(){
+    auto scene = HomeScene::createScene();
+    Director::getInstance()->replaceScene(scene);
+}
+
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
+    
+    auto* running_scene = Director::getInstance()->getRunningScene()->getChildren().at(1);
+    if(running_scene->getName() == "HomeScene"){
+        dynamic_cast<HomeScene*>(running_scene)->refreshScene();
+    }
+    
     Director::getInstance()->startAnimation();
-
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
 
 bool AppDelegate::initGame(){
+    auto* tiny_data = UserDefault::getInstance();
     std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
-    UserDefault::getInstance()->setIntegerForKey("money", 500);
+    std::time_t timer;
+    struct std::tm *t_st;
+    
+    std::time(&timer);
+    t_st = localtime(&timer);
+    int _time = t_st->tm_sec + t_st->tm_min * 60 + t_st->tm_hour * 3600;
+    
+    tiny_data->setIntegerForKey("previous_time", _time);
+    tiny_data->setIntegerForKey("time", 500);
+    
+    tiny_data->setBoolForKey("isCommingToy",false);
+    tiny_data->setBoolForKey("isCommingMeal",false);
+    tiny_data->setBoolForKey("isCommingFuton",false);
+    tiny_data->setBoolForKey("isCommingTrimmer",false);
+    
     CCLOG("%s",(filepath + "cat_box.csv").c_str());
     std::ofstream ofs(filepath + "cat_box.csv",std::ios::trunc);
     if(!ofs.is_open()){

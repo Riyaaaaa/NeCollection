@@ -13,6 +13,8 @@ class  AppDelegate : private cocos2d::Application
 public:
     AppDelegate();
     virtual ~AppDelegate();
+    
+    void launchGame();
 
     virtual void initGLContextAttrs();
 
@@ -36,6 +38,8 @@ public:
     virtual void applicationWillEnterForeground();
     
     virtual bool initGame();
+private:
+    cocos2d::Scene* _home_scene;
 };
 
 #endif // _APP_DELEGATE_H_

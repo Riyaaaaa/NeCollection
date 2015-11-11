@@ -16,7 +16,7 @@
 
 USING_NS_CC;
 
-bool MainScene::initUI(){
+bool MainScene::initMainMenu(){
     auto initMenuButton = [&](auto* scene,std::string button){
         _scene->getChildByName("Menu")->
         getChildByName<ui::Button*>(button)->
@@ -28,16 +28,23 @@ bool MainScene::initUI(){
     
     initMenuButton( reinterpret_cast<HomeScene*>(0),"home");
     initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
-    //initMenuButton("shop","shop/ShopScene.csb");
-    //initMenuButton("dictionary","dictionary/DictionaryScene.csb");
-    //initMenuButton("battle","battle/BattleScene.csb");
-    
+    initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
     return true;
 }
 
-bool MainScene::init(){
-    if ( !MainScene::init() )
+bool MainScene::init(std::string filename){
+    if ( !Layer::init() )
     {
         return false;
     }
+    
+    Size size = Director::getInstance()->getVisibleSize();
+    
+    _scene = CSLoader::getInstance()->createNode(filename);
+    _scene->setContentSize(size);
+    cocos2d::ui::Helper::doLayout(_scene);
+    addChild(_scene);
+    
+    initMainMenu();
+    return true;
 }

@@ -21,28 +21,21 @@ Scene* VisualScene::createScene()
 {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
-    Size size = Director::getInstance()->getVisibleSize();
     
-    scene->addChild(VisualScene::create());
+    scene->addChild(VisualScene::create(),SCENE,"VisualScene");
     
     // return the scene
     return scene;
 }
 
 bool VisualScene::init(){
-    _scene = CSLoader::getInstance()->createNode("dictionary/VisualScene.csb");
-    Size size = Director::getInstance()->getVisibleSize();
     
-    _scene->setContentSize(size);
-    cocos2d::ui::Helper::doLayout(_scene);
-    addChild(_scene);
-    
-    if ( !MainScene::init() )
+    if ( !MainScene::init("dictionary/VisualScene.csb") )
     {
         return false;
     }
     
-    if( !initUI() || !initVisualDictionary()){
+    if(!initVisualDictionary()){
         return false;
     }
     return true;

@@ -13,9 +13,10 @@
 
 class MainScene: public cocos2d::Layer{
 public:
-    bool init();
+    virtual bool init(std::string);
+    virtual ~MainScene()=default;
 protected:
-    bool initUI();
+    bool initMainMenu();
     cocos2d::Node* _scene;
 };
 
