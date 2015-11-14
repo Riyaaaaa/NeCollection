@@ -61,6 +61,7 @@ void UserData::addCats(int id){
     if(!ofs.is_open())throw "can't open cat_box.csv";
     
     ofs << std::to_string(id) + ',';
+    _cat_box.push_back(id);
     _is_obtain[id] = true;
 }
 

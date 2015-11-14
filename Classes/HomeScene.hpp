@@ -35,6 +35,7 @@ public:
     void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
     
     void saveScheduleTime();
+    void saveObjectStatus();
     
 protected:
     enum class CAT_OBJECT{

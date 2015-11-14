@@ -151,9 +151,9 @@ Node* ShopScene::createProducts(Products products){
 }
 
 void ShopScene::setBuyEvent(cocos2d::Node *container, int id){
-    bool isObtain = dbIO::getInstance()->getProdubtIsObtain(id);
+    bool isObtain = dbIO::getInstance()->getProductIsObtain(id);
     
-    if(!isObtain && UserData::getInstance()->getMoney() >= _products_list[_current_products].price){
+    if(!isObtain){
         auto listener = EventListenerTouchOneByOne::create();
         listener->onTouchBegan = CC_CALLBACK_2(ShopScene::buyProducts,this);
         listener->setSwallowTouches(true);
@@ -179,13 +179,20 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
         
         modal_window->getChildByName<ui::Button*>("no")->addClickEventListener([=](Ref* ref){modal_layer->removeFromParent();});
         
-        modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
-            this->soldOut(_lineup_products[_current_products]);
-            dbIO::getInstance()->queryTable("update products set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
-            UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
-            modal_layer->removeFromParent();
-            this->refreshScreen();
-        });
+        if(UserData::getInstance()->getMoney() < _products_list[_current_products].price){
+            modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::RED);
+            modal_window->getChildByName<ui::Button*>("yes")->setEnabled(false);
+        }
+        else{
+            modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
+                modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::BLUE);
+                this->soldOut(_lineup_products[_current_products]);
+                dbIO::getInstance()->queryTable("update products set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
+                UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
+                modal_layer->removeFromParent();
+                this->refreshScreen();
+            });
+        }
         
         auto listner = EventListenerTouchOneByOne::create();
         listner->setSwallowTouches(true);

@@ -18,7 +18,9 @@ public:
 private:
     
     enum ZOrder{
-        SCENE=0
+        SCENE=0,
+        DICTIONARY=10,
+        MAINMENU=100,
     };
     
     virtual bool init();

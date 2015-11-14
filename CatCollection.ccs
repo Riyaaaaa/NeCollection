@@ -18,6 +18,13 @@
           <Image Name="money_plate.png" />
           <Project Name="MenuUI.csd" Type="Layer" />
           <Project Name="MoneyUI.csd" Type="Layer" />
+          <Image Name="window_plate.png" />
+          <Image Name="no.png" />
+          <Image Name="no_pressed.png" />
+          <Image Name="yes.png" />
+          <Image Name="yes_pressed.png" />
+          <Image Name="modal_window.png" />
+          <Image Name="yes_disenable.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
@@ -52,8 +59,13 @@
           <Project Name="VisualCat.csd" Type="Layer" />
           <Image Name="NoImage.png" />
         </Folder>
-        <Image Name="no.png" />
-        <Image Name="yes.png" />
+        <Folder Name="utility">
+          <Image Name="utility_ui.png" />
+        </Folder>
+        <Folder Name="box">
+          <Project Name="BoxLayer.csd" Type="Layer" />
+        </Folder>
+        <Image Name="neko00.png" />
       </RootFolder>
     </Group>
   </SolutionFolder>

@@ -31,7 +31,7 @@ public:
     /* query to product table*/
     std::vector<Products> getProductAll();
     std::vector<Products> getProductTypeAll(PRODUCTS);
-    bool getProdubtIsObtain(int);
+    bool getProductIsObtain(int);
     
     ~dbIO();
     

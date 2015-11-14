@@ -185,7 +185,7 @@ std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
     return list;
 }
 
-bool dbIO::getProdubtIsObtain(int id){
+bool dbIO::getProductIsObtain(int id){
     bool isObtain;
     std::string sql = "select isObtain from products where id='" + std::to_string(id) + "'";
     sqlite3_stmt *stmt=nullptr;

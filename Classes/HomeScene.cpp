@@ -97,9 +97,9 @@ bool HomeScene::initStatus(){
         }
                                                                            );
     if(tiny_data->getBoolForKey("isCommingToy"))
-        _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(true);
+        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
     else
-        _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->setEnabled(false);
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]
         = _home_bg->getChildByName<ui::Button*>("meal");
@@ -109,9 +109,9 @@ bool HomeScene::initStatus(){
     }
                                                                             );
     if(tiny_data->getBoolForKey("isCommingMeal"))
-        _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(true);
+        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
     else
-        _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->setEnabled(false);
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
     
     _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]
         = _home_bg->getChildByName<ui::Button*>("futon");
@@ -121,9 +121,9 @@ bool HomeScene::initStatus(){
     }
                                                                              );
     if(tiny_data->getBoolForKey("isCommingFuton"))
-        _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(true);
+        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
     else
-        _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->setEnabled(false);
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
     
     
     _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]
@@ -135,9 +135,9 @@ bool HomeScene::initStatus(){
                                                                                
                                                                                );
     if(tiny_data->getBoolForKey("isCommingTrimmer"))
-        _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(true);
+        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
     else
-        _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->setEnabled(false);
+        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
     
     return true;
 }
@@ -170,7 +170,8 @@ void HomeScene::comeCat(){
 
 void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
     btn->setEnabled(false);
-    btn->getChildByName<Sprite*>("alert")->removeFromParent();
+    auto* alert = btn->getChildByName<Sprite*>("alert");
+    if(alert)alert->removeFromParent();
 }
 
 void HomeScene::enableCatObject(ui::Button* btn){
@@ -220,6 +221,14 @@ void HomeScene::saveScheduleTime(){
     tiny_data->setIntegerForKey("time",_remain_event_time);
 }
 
+void HomeScene::saveObjectStatus(){
+    auto* tiny_data = UserDefault::getInstance();
+    
+    tiny_data->setBoolForKey("isCommingToy", _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->isEnabled());
+    tiny_data->setBoolForKey("isCommingMeal", _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->isEnabled());
+    tiny_data->setBoolForKey("isCommingTrimmer", _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->isEnabled());
+    tiny_data->setBoolForKey("isCommingFuton", _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->isEnabled());
+}
 
 bool HomeScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
     _old_pos = touch->getLocation();
@@ -269,4 +278,5 @@ void HomeScene::refreshScene(){
 
 HomeScene::~HomeScene(){
     saveScheduleTime();
+    saveObjectStatus();
 }
