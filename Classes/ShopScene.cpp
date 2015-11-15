@@ -137,7 +137,7 @@ void ShopScene::setProducts(PRODUCTS identify){
 Node* ShopScene::createProducts(Products products){
     Node* products_container = CSLoader::getInstance()->createNode("shop/ProductsUI.csb");
     auto image = products_container->getChildByName<ui::ImageView*>("ProductImg");
-    image->loadTexture("products/" + products.name + ".png");
+    image->loadTexture("products/" + fill_zero(products.id) + ".png");
     products_container->getChildByName<ui::Text*>("price")->setText(std::to_string(products.price)+" yen");
     
     if(products.isObtain){
@@ -176,6 +176,7 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
         
         modal_window->getChildByName<ui::Text*>("before_money")->setString(std::to_string(money));
         modal_window->getChildByName<ui::Text*>("after_money")->setString(std::to_string(money - _products_list[_current_products].price));
+        modal_window->getChildByName<Sprite*>("product")->setTexture("products/" + fill_zero(_products_list[_current_products].id) + ".png");
         
         modal_window->getChildByName<ui::Button*>("no")->addClickEventListener([=](Ref* ref){modal_layer->removeFromParent();});
         
@@ -184,8 +185,8 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
             modal_window->getChildByName<ui::Button*>("yes")->setEnabled(false);
         }
         else{
+            modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::BLUE);
             modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
-                modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::BLUE);
                 this->soldOut(_lineup_products[_current_products]);
                 dbIO::getInstance()->queryTable("update products set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
                 UserData::getInstance()->setMoney(money -_products_list[_current_products].price);

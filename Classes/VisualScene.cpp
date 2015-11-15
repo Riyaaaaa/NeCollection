@@ -43,18 +43,31 @@ bool VisualScene::init(){
 
 bool VisualScene::initVisualDictionary(){
     const int CONTENTS_MARGIN = 10;
-    dbIO* db = dbIO::getInstance();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    ui::ScrollView* dictionary_bg = ui::ScrollView::create();
+    dictionary_bg->setAnchorPoint(Vec2(0,1));
+    dictionary_bg->setPosition(Vec2(0,visibleSize.height-_scene->getChildByName("title")->getContentSize().height));
+    dictionary_bg->setDirection(ui::ScrollView::Direction::VERTICAL);
+    _scene->addChild(dictionary_bg);
     
-    ui::ScrollView* dictionary_bg = _scene->getChildByName<ui::ScrollView*>("DictionaryView");
-    
-    auto* innerContainer = LayerColor::create(Color4B::RED);
+    auto* innerContainer = LayerColor::create(Color4B(128,128,128,128));
     innerContainer->setAnchorPoint(Vec2(0,1));
-    dictionary_bg->addChild(innerContainer);
-    dictionary_bg->setInnerContainerPosition(Vec2(0,dictionary_bg->getContentSize().height));
-    dictionary_bg->setInnerContainerSize( Size(dictionary_bg->getContentSize().width,
-                                         (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3)
-                                         )
+    innerContainer->setContentSize(Size(visibleSize.width,
+                                        (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
+                                        )
                                    );
+    dictionary_bg->addChild(innerContainer);
+    
+    dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
+                                               (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
+                                               )
+                                         );
+    dictionary_bg->setContentSize(Size(visibleSize.width,visibleSize.height
+                                       -_scene->getChildByName("title")->getContentSize().height
+                                       -_scene->getChildByName("Menu")->getContentSize().height));
+    dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-_scene->getChildByName("title")->getContentSize().height));
+    //dictionary_bg->setInnerContainerPosition(Vec2(0,dictionary_bg->getContentSize().height));
     
     Size visual_size = innerContainer->getContentSize();
     
@@ -71,5 +84,7 @@ bool VisualScene::initVisualDictionary(){
         }
     }
     
+    CCLOG("Dictionary Size=(%f,%f)",dictionary_bg->getContentSize().width,dictionary_bg->getContentSize().height);
+    CCLOG("Visual Size=(%f,%f)",innerContainer->getContentSize().width,innerContainer->getContentSize().height);
     return true;
 }

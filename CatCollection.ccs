@@ -18,13 +18,6 @@
           <Image Name="money_plate.png" />
           <Project Name="MenuUI.csd" Type="Layer" />
           <Project Name="MoneyUI.csd" Type="Layer" />
-          <Image Name="window_plate.png" />
-          <Image Name="no.png" />
-          <Image Name="no_pressed.png" />
-          <Image Name="yes.png" />
-          <Image Name="yes_pressed.png" />
-          <Image Name="modal_window.png" />
-          <Image Name="yes_disenable.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
