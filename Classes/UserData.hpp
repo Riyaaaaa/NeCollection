@@ -17,6 +17,7 @@ class UserData{
 public:
     static UserData* getInstance(){ static UserData obj; return &obj;}
     void addCats(int id);
+    std::vector<int>& getCats(){return _cat_box;};
     void setMoney(int money);
     int getMoney(){ return _money; };
 private:

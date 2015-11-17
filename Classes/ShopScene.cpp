@@ -13,6 +13,7 @@
 #include "UserData.hpp"
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
+#include "BoxLayer.hpp"
 
 USING_NS_CC;
 
@@ -76,7 +77,7 @@ bool ShopScene::initUI(){
     ui_layer->getChildByName<ui::Button*>("toy")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TOY);});
     ui_layer->getChildByName<ui::Button*>("futon")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::FUTON);});
     ui_layer->getChildByName<ui::Button*>("trimmer")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TRIMMER);});
-    
+    _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){this->addChild(BoxLayer::create());});
     refreshScreen();
     
     return true;

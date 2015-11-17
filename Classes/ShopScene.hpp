@@ -50,7 +50,8 @@ private:
         SCENE=0,
         UI=2,
         MODAL_LAYER=3,
-        MODAL_WINDOW=4
+        MODAL_WINDOW=4,
+        BOX=10
     };
     
     int _current_products;

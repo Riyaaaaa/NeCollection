@@ -33,6 +33,11 @@ public:
     std::vector<Products> getProductTypeAll(PRODUCTS);
     bool getProductIsObtain(int);
     
+    std::vector<int> getPrimaryKeys(std::string table);
+    
+    std::vector<int> getColumnsInt(std::string table,std::string column);
+    std::vector<std::string> getColumnsText(std::string table,std::string column);
+    
     ~dbIO();
     
 private:

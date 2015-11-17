@@ -78,9 +78,9 @@ Cat dbIO::getCatById(int id){
     
     int r;
     if(SQLITE_ROW == (r=sqlite3_step(stmt))){
-        cat.id = id;
-        cat.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-        cat.discription = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        cat.setId(id);
+        cat.setName(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+        cat.setDiscription(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
     }
     else{
         CCLOG("SELECT ERROR");
@@ -123,9 +123,9 @@ std::vector<Cat> dbIO::getCatAll(){
     int r;
     while(SQLITE_ROW == (r=sqlite3_step(stmt))){
         cat.push_back(Cat());
-        cat.back().id = sqlite3_column_int(stmt, 1);
-        cat.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-        cat.back().discription = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        cat.back().setId(sqlite3_column_int(stmt, 1));
+        cat.back().setName(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+        cat.back().setDiscription(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
     }
     if(r != SQLITE_DONE){
         CCLOG("SELECT ERROR");
@@ -204,6 +204,66 @@ bool dbIO::getProductIsObtain(int id){
     sqlite3_finalize(stmt);
 
     return isObtain;
+}
+
+std::vector<int> dbIO::getPrimaryKeys(std::string table){
+    std::vector<int> keys;
+    std::string sql = "select id from " + table;
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        keys.push_back(sqlite3_column_int(stmt, 0));
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+
+    sqlite3_finalize(stmt);
+    return keys;
+}
+
+std::vector<int> dbIO::getColumnsInt(std::string table,std::string column){
+    std::vector<int> columns;
+    std::string sql = "select " + column + " from " + table;
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        columns.push_back(sqlite3_column_int(stmt, 0));
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return columns;
+}
+
+std::vector<std::string> dbIO::getColumnsText(std::string table,std::string column){
+    std::vector<std::string> columns;
+    std::string sql = "select " + column + " from " + table;
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        columns.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return columns;
 }
 
 dbIO::~dbIO(){

@@ -189,7 +189,7 @@ void HomeScene::getCat(int id){
     Node* resultScene = (CSLoader::getInstance()->createNode("result/GetResultScene.csb"));
     ui::Text* message = resultScene->getChildByName("Window")->getChildByName<ui::Text*>("Message");
     
-    message->setString(cat.discription);
+    message->setString(cat.getDiscription());
     
     Sprite* sprite = Sprite::create(Cat::neko_id_to_string(id));
     resultScene->addChild(sprite);

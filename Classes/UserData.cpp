@@ -8,12 +8,14 @@
 
 #include"UserData.hpp"
 #include"cocos2d.h"
+#include"dbIO.hpp"
 #include<iostream>
 #include<fstream>
 
 using namespace cocos2d;
 
 void UserData::saveFile(){
+    /*
     std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
     std::ofstream ofs(filepath + "cat_box.csv",std::ios::trunc);
     if(!ofs.is_open())throw "can't open cat_box.csv";
@@ -24,24 +26,18 @@ void UserData::saveFile(){
         ofs << id;
     }
     ofs << std::endl;
+     */
 }
 
 void UserData::loadFile(){
-    std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
-    std::ifstream ifs(filepath + "cat_box.csv");
-    if(!ifs.is_open())throw "can't open cat_box.csv";
-    
-    std::string line,cat_id;
+    auto* db = dbIO::getInstance();
+    std::vector<int> keys = db->getColumnsInt("catbox","cat_id");
     
     _cat_box.clear();
-    getline(ifs, line);
+    _cat_box.resize(keys.size());
     
-    std::istringstream stream(line);
-    while( getline( stream, cat_id, ',' ) ) {
-        if(cat_id.empty())continue;
-        int id = std::atoi(cat_id.c_str());
-        _cat_box.push_back(id);
-        _is_obtain[id] = true;
+    for(std::size_t i=0; i<_cat_box.size(); i++){
+        _cat_box[i] = keys[i];
     }
 }
 
@@ -56,13 +52,10 @@ UserData::UserData(){
 }
 
 void UserData::addCats(int id){
-    std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
-    std::ofstream ofs(filepath + "cat_box.csv", std::ios_base::ate);
-    if(!ofs.is_open())throw "can't open cat_box.csv";
-    
-    ofs << std::to_string(id) + ',';
+    auto* db = dbIO::getInstance();
+    db->queryTable("insert into catbox (date,cat_id) values(datetime('now')," + std::to_string(id) + ")");
+    db->queryTable("update catbox set isObtain = 1 where id = " + std::to_string(id) + ";");
     _cat_box.push_back(id);
-    _is_obtain[id] = true;
 }
 
 void UserData::setMoney(int money){

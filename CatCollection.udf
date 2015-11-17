@@ -28,22 +28,5 @@
         <EnableHTML5Advanced Value="False" />
       </Value>
     </Item>
-    <Item Key="TabsParamsKey">
-      <Value ctype="TabsInfo">
-        <OpenedDocuments>
-          <FilePathData Path="shop/Buy_Window.csd" />
-          <FilePathData Path="shop/ProductsUI.csd" />
-          <FilePathData Path="shop/ShopScene.csd" />
-          <FilePathData Path="UI/MoneyUI.csd" />
-          <FilePathData Path="dictionary/VisualScene.csd" />
-          <FilePathData Path="result/GetResultScene.csd" />
-          <FilePathData Path="home/HomeScene.csd" />
-          <FilePathData Path="dictionary/VisualCat.csd" />
-          <FilePathData Path="UI/MenuUI.csd" />
-          <FilePathData Path="box/BoxLayer.csd" />
-        </OpenedDocuments>
-        <ActiveDocument Path="dictionary/VisualScene.csd" />
-      </Value>
-    </Item>
   </Properties>
 </UserData>
