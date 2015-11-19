@@ -8,7 +8,6 @@
 
 #include "BoxLayer.hpp"
 #include "UserData.hpp"
-#include "Cat.hpp"
 
 USING_NS_CC;
 
@@ -41,7 +40,7 @@ bool BoxLayer::init(){
     
     auto* lisener = EventListenerTouchOneByOne::create();
     lisener->onTouchBegan = [=](Touch* touch,Event* event){ this->removeFromParent(); return true; };
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
     
     if(!initCats()){
         return false;
@@ -51,8 +50,6 @@ bool BoxLayer::init(){
 }
 
 bool BoxLayer::initCats(){
-    _cat_list = UserData::getInstance()->getCats();
-    
     Size visibleSize = Director::getInstance()->getVisibleSize();
     
     _dictionary_bg = ui::ScrollView::create();
@@ -61,39 +58,17 @@ bool BoxLayer::initCats(){
     _dictionary_bg->setDirection(ui::ScrollView::Direction::VERTICAL);
     _layer->addChild(_dictionary_bg);
     
-    const int CONTENTS_MARGIN = 20;
-    
-    auto* innerContainer = LayerColor::create(Color4B(128,128,128,128));
+    innerContainer = LayerColor::create(Color4B(128,128,128,128));
     innerContainer->setAnchorPoint(Vec2(0,1));
-    innerContainer->setContentSize(Size(visibleSize.width,
-                                        (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
-                                        )
-                                   );
-    _dictionary_bg->addChild(innerContainer);
     
-    _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
-                                               (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
-                                               )
-                                         );
+    _dictionary_bg->addChild(innerContainer,0,"container");
+    
     _dictionary_bg->setContentSize(Size(visibleSize.width,visibleSize.height
                                        -_layer->getChildByName("title")->getContentSize().height));
     _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
     //_dictionary_bg->setInnerContainerPosition(Vec2(0,_dictionary_bg->getContentSize().height));
     
-    Size visual_size = innerContainer->getContentSize();
-    
-    for(int i=0; i<params::NUMBER_OF_CATS;){
-        for(int j=0; j<3 && i<params::NUMBER_OF_CATS ; j++){
-            auto file_path = Cat::neko_id_to_string(i);
-            CatIcon* visual_contents = CatIcon::create(i);
-            Size contents_size = visual_contents->getContentSize();
-            innerContainer->addChild(visual_contents);
-            visual_contents->setAnchorPoint(Vec2(0,1));
-            visual_contents->setPosition(Vec2((visual_size.width/3) * j + CONTENTS_MARGIN,
-                                               visual_size.height - (contents_size.height + CONTENTS_MARGIN) * (i/3)));
-            i++;
-        }
-    }
+    _dictionary_bg->setName("scrollview");
     
     return true;
 }
@@ -118,17 +93,83 @@ bool BoxLayerForSell::init(int max_select_cats){
         return false;
     }
     
-    auto& contents = _dictionary_bg->getChildren();
-    for(auto* content: contents){
-        CatIcon* ico = dynamic_cast<CatIcon*>(content);
-        ico->addClickEventListener([=](Ref* ref){
-            if(!ico->getSelect() && _current_selected_cats == _max_select_cats)return;
-            ico->changeState();
-            if(ico->getSelect())_current_selected_cats--;
-            else _current_selected_cats++;
-        });
-    }
+    _cat_list = UserData::getInstance()->getCats();
     
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Size visual_size = innerContainer->getContentSize();
+    const int CONTENTS_MARGIN = 20;
+    
+    innerContainer->setContentSize(Size(visibleSize.width,
+                                        (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
+                                        )
+                                   );
+    _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
+                                                (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
+                                                )
+                                          );
+    
+    for(int i=0; i<_cat_list.size();){
+        for(int j=0; j<3 && i<_cat_list.size() ; j++){
+            auto file_path = Cat::neko_id_to_string(_cat_list[i].getId());
+            CatIcon* visual_contents = CatIcon::create(_cat_list[i].getId());
+            Size contents_size = visual_contents->getContentSize();
+            innerContainer->addChild(visual_contents);
+            visual_contents->setAnchorPoint(Vec2(0,1));
+            visual_contents->setPosition(Vec2((visual_size.width/3) * j + CONTENTS_MARGIN,
+                                              visual_size.height - (contents_size.height + CONTENTS_MARGIN) * (i/3)));
+            
+            visual_contents->addClickEventListener([=](Ref* ref){
+                if(!visual_contents->getSelect() && _number_of_selected_cats == _max_select_cats){
+                    //todo max select
+                    return;
+                }
+                visual_contents->changeState();
+                if(!visual_contents->getSelect()){
+                    this->_selected_cats.erase( std::find(_selected_cats.begin(),_selected_cats.end(),i) );
+                    _number_of_selected_cats--;
+                }
+                else {
+                    this->_selected_cats.push_back( i );
+                    _number_of_selected_cats++;
+                }
+            });
+
+            
+            i++;
+        }
+    }
+
     _max_select_cats = max_select_cats;
     return true;
 }
+
+bool BoxLayerForVisual::init(){
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Size visual_size = innerContainer->getContentSize();
+    const int CONTENTS_MARGIN = 20;
+    
+    innerContainer->setContentSize(Size(visibleSize.width,
+                                        (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
+                                        )
+                                   );
+    _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
+                                                (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
+                                                )
+                                          );
+    
+    for(int i=0; i<params::NUMBER_OF_CATS;){
+        for(int j=0; j<3 && i<params::NUMBER_OF_CATS ; j++){
+            auto file_path = Cat::neko_id_to_string(i);
+            CatIcon* visual_contents = CatIcon::create(i);
+            Size contents_size = visual_contents->getContentSize();
+            innerContainer->addChild(visual_contents);
+            visual_contents->setAnchorPoint(Vec2(0,1));
+            visual_contents->setPosition(Vec2((visual_size.width/3) * j + CONTENTS_MARGIN,
+                                              visual_size.height - (contents_size.height + CONTENTS_MARGIN) * (i/3)));
+            i++;
+        }
+    }
+    
+    return true;
+}
+

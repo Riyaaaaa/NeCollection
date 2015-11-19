@@ -77,7 +77,7 @@ bool ShopScene::initUI(){
     ui_layer->getChildByName<ui::Button*>("toy")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TOY);});
     ui_layer->getChildByName<ui::Button*>("futon")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::FUTON);});
     ui_layer->getChildByName<ui::Button*>("trimmer")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TRIMMER);});
-    _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){this->addChild(BoxLayer::create());});
+    _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){this->addChild(BoxLayerForSell::create(10));});
     refreshScreen();
     
     return true;

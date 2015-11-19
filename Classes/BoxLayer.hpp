@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
+#include "Cat.hpp"
 
 class BoxLayer : public cocos2d::Layer{
 public:
@@ -23,8 +24,7 @@ protected:
     int _max_select_cats;
     cocos2d::Node* _layer;
     cocos2d::ui::ScrollView* _dictionary_bg;
-    
-    std::vector<int> _cat_list;
+    cocos2d::Node* innerContainer;
 };
 
 class BoxLayerForSell : public BoxLayer{
@@ -34,7 +34,17 @@ public:
     
 private:
     int _max_select_cats;
-    int _current_selected_cats;
+    int _number_of_selected_cats;
+    
+    std::vector<Cat> _cat_list;
+    std::vector<int> _selected_cats;
+};
+
+class BoxLayerForVisual : public BoxLayer{
+public:
+    virtual bool init();
+    CREATE_FUNC(BoxLayerForVisual);
+private:
 };
 
 #endif /* BoxLayer_hpp */

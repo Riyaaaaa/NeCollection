@@ -14,7 +14,7 @@
 #include "cocostudio/CocoStudio.h"
 
 struct Cat{
-    explicit Cat(int id);
+    Cat(int id);
     Cat()=default;
     
     static std::string neko_id_to_string(int id){
@@ -39,9 +39,12 @@ struct CatIcon : public cocos2d::ui::Button{
     bool getSelect(){return _isSelected;}
     
     void changeState(){setSelect(!_isSelected);}
+    void setTouchEnabled(bool enable) override;
+
+    
+    CC_SYNTHESIZE(Cat, _cat, Cat);
     
 private:
-    Cat _cat;
     bool _isSelected=false;
 };
 
