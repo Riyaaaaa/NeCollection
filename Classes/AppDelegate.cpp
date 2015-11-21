@@ -149,7 +149,7 @@ bool AppDelegate::initGame(){
     /* initialize to debug*/
     dbIO::getInstance()->queryTable("update products set isObtain = 0;");
     dbIO::getInstance()->queryTable("delete from catbox;");
-    for(int i=0; i<20; i++){
+    for(int i=0; i<10; i++){
         UserData::getInstance()->addCats(i);
     }
     

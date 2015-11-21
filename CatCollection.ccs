@@ -25,6 +25,9 @@
           <Image Name="yes.png" />
           <Image Name="yes_disenable.png" />
           <Image Name="yes_pressed.png" />
+          <Project Name="sell_window.csd" Type="Layer" />
+          <Image Name="cat_active.png" />
+          <Image Name="cat_gray.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />

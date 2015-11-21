@@ -38,9 +38,12 @@ bool BoxLayer::init(){
     retButton->setAnchorPoint(Vec2(0,0.5));
     retButton->setPosition(Vec2(0,_layer->getChildByName("title")->getPosition().y));
     
-    auto* lisener = EventListenerTouchOneByOne::create();
-    lisener->onTouchBegan = [=](Touch* touch,Event* event){ this->removeFromParent(); return true; };
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
+    lisener = EventListenerTouchOneByOne::create();
+    lisener->onTouchBegan = [=](Touch* touch,Event* event){
+        this->removeFromParent();
+        return true;
+    };
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
     
     if(!initCats()){
         return false;
@@ -126,10 +129,12 @@ bool BoxLayerForSell::init(int max_select_cats){
                 visual_contents->changeState();
                 if(!visual_contents->getSelect()){
                     this->_selected_cats.erase( std::find(_selected_cats.begin(),_selected_cats.end(),i) );
+                    if(_callback)_callback(eventType::DESELECT);
                     _number_of_selected_cats--;
                 }
                 else {
                     this->_selected_cats.push_back( i );
+                    if(_callback)_callback(eventType::SELECT);
                     _number_of_selected_cats++;
                 }
             });

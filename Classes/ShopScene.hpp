@@ -17,6 +17,9 @@
 #include "params.h"
 #include "Products.hpp"
 #include "MainScene.h"
+#include "BoxLayer.hpp"
+
+class SellContainer;
 
 class ShopScene : public MainScene
 {
@@ -33,6 +36,8 @@ public:
     //void onTouchMoved(cocos2d::Touch*,cocos2d::Event*);
     //void onTouchEnded(cocos2d::Touch*,cocos2d::Event*);
     //void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
+    
+    void sellCallBack(BoxLayerForSell::eventType);
     
 private:
     bool initUI();
@@ -51,7 +56,8 @@ private:
         UI=2,
         MODAL_LAYER=3,
         MODAL_WINDOW=4,
-        BOX=10
+        BOX=10,
+        SELL_WINDOW=11
     };
     
     int _current_products;
@@ -61,9 +67,28 @@ private:
     cocos2d::Sprite* _left_arrow=nullptr;
     cocos2d::Sprite* _right_arrow=nullptr;
     
+    BoxLayerForSell* _sell_box;
+    SellContainer* _sell_window;
+    
     std::vector<Node*> _lineup_products;
     std::vector<Products> _products_list;
     int  _number_of_lineup_products;
+};
+
+class SellContainer : public cocos2d::Node{
+public:
+    virtual bool init();
+    CREATE_FUNC(SellContainer);
+    
+    void setMoney(int);
+    CC_SYNTHESIZE_READONLY(int, _money, Money);
+    
+    void select();
+    void deselect();
+private:
+    int _current_select=0;
+    cocos2d::Node* _window;
+
 };
 
 #endif /* ShopScene_hpp */

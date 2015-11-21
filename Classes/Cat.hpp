@@ -22,6 +22,7 @@ struct Cat{
     }
     
     CC_SYNTHESIZE(int, _id, Id);
+    CC_SYNTHESIZE(int, _selling_price, SellingPrice);
     CC_SYNTHESIZE(std::string, _name, Name);
     CC_SYNTHESIZE(std::string, _discription, Discription);
 

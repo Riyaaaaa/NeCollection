@@ -81,6 +81,7 @@ Cat dbIO::getCatById(int id){
         cat.setId(id);
         cat.setName(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
         cat.setDiscription(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+        cat.setSellingPrice(sqlite3_column_int(stmt, 3));
     }
     else{
         CCLOG("SELECT ERROR");

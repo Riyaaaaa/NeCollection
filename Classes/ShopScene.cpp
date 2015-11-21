@@ -13,7 +13,6 @@
 #include "UserData.hpp"
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
-#include "BoxLayer.hpp"
 
 USING_NS_CC;
 
@@ -77,7 +76,14 @@ bool ShopScene::initUI(){
     ui_layer->getChildByName<ui::Button*>("toy")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TOY);});
     ui_layer->getChildByName<ui::Button*>("futon")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::FUTON);});
     ui_layer->getChildByName<ui::Button*>("trimmer")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TRIMMER);});
-    _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){this->addChild(BoxLayerForSell::create(10));});
+    _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){
+        _sell_box = BoxLayerForSell::create(10);
+        this->addChild(_sell_box,ZORDER::BOX);
+        _sell_box->setCallback(CC_CALLBACK_1(ShopScene::sellCallBack, this));
+        
+        _sell_window = SellContainer::create();
+        this->addChild(_sell_window,ZORDER::SELL_WINDOW);
+    });
     refreshScreen();
     
     return true;
@@ -284,9 +290,57 @@ void ShopScene::refreshScreen(){
         ->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
 }
 
+void ShopScene::sellCallBack(BoxLayerForSell::eventType type){
+    switch (type) {
+        case BoxLayerForSell::eventType::SELECT:
+            _sell_window->select();
+            break;
+            
+        case BoxLayerForSell::eventType::DESELECT:
+            _sell_window->deselect();
+            break;
+    }
+    
+    std::vector<int> selected_cats = _sell_box->getSelectedCats();
+    const std::vector<Cat>& cats = _sell_box->getCatList();
+    int sum=0;
+    
+    for(int index:  selected_cats){
+        sum += cats[index].getSellingPrice();
+    }
+    
+    _sell_window->setMoney(sum);
+}
+
 ShopScene::~ShopScene(){
     for(long i=0; i<_lineup_products.size(); i++){
         _lineup_products[i]->removeFromParent();
         _lineup_products[i]->release();
     }
+}
+
+bool SellContainer::init(){
+    
+    if(!Node::init())return false;
+    
+    _window = CSLoader::createNode("UI/sell_window.csb");
+    if(!_window)return false;
+    addChild(_window);
+    
+    return true;
+}
+
+void SellContainer::select(){
+    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/cat_active.png");
+    _current_select++;
+}
+
+void SellContainer::deselect(){
+    _current_select--;
+    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/cat_gray.png");
+}
+
+void SellContainer::setMoney(int money){
+    _money = money;
+    _window->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
 }
