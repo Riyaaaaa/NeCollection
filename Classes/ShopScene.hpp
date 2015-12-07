@@ -37,7 +37,7 @@ public:
     //void onTouchEnded(cocos2d::Touch*,cocos2d::Event*);
     //void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
     
-    void sellCallBack(BoxLayerForSell::eventType);
+    void sellCallBack(int);
     
 private:
     bool initUI();

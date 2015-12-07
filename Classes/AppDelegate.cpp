@@ -128,6 +128,7 @@ void AppDelegate::applicationWillEnterForeground() {
 
 bool AppDelegate::initGame(){
     auto* tiny_data = UserDefault::getInstance();
+    auto* db = dbIO::getInstance();
     std::string filepath = cocos2d::FileUtils::getInstance()->getWritablePath();
     std::time_t timer;
     struct std::tm *t_st;
@@ -146,12 +147,30 @@ bool AppDelegate::initGame(){
     
     UserData::getInstance()->setMoney(500);
     
-    /* initialize to debug*/
-    dbIO::getInstance()->queryTable("update products set isObtain = 0;");
-    dbIO::getInstance()->queryTable("delete from catbox;");
-    for(int i=0; i<10; i++){
+    /* initialize to debug  */
+    db->queryTableWritable("update products set isObtain = 0;");
+    db->queryTableWritable("drop table catbox");
+    db->queryTableWritable("drop table productbox");
+    db->queryTableWritable("drop table cat_isobtain");
+    /* end debug code       */
+    
+    db->queryTableWritable("create table catbox(id integer primary key,date text,cat_id integer)");
+    db->queryTableWritable("create table productbox(id integer primary key);");
+    db->queryTableWritable("create table cat_isobtain(id integer primary key,isObtain integer)");
+    
+    for(int i=0; i<NUMBER_OF_CATS; i++){
+        db->queryTableWritable("insert into cat_isobtain("+std::to_string(i)+",0)");
+    }
+    
+    for(int i=0; i<NUMBER_OF_PRODUCTS; i++){
+        db->queryTableWritable("insert into productbox("+std::to_string(i)+")");
+    }
+    
+    /* add data to debug    */
+    for(int i=0; i<NUMBER_OF_CATS; i++){
         UserData::getInstance()->addCats(i);
     }
+    /* end debug code       */
     
     return true;
 }

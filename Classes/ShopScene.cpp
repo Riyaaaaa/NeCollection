@@ -195,7 +195,7 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
             modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::BLUE);
             modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
                 this->soldOut(_lineup_products[_current_products]);
-                dbIO::getInstance()->queryTable("update products set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
+                dbIO::getInstance()->queryTableWritable("insert into productbox values(" + std::to_string(_products_list[_current_products].id) + ");");
                 UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
                 modal_layer->removeFromParent();
                 this->refreshScreen();
@@ -290,8 +290,12 @@ void ShopScene::refreshScreen(){
         ->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
 }
 
-void ShopScene::sellCallBack(BoxLayerForSell::eventType type){
+void ShopScene::sellCallBack(int type){
     switch (type) {
+        case BoxLayerForSell::eventType::CLOSE:
+            _sell_window->removeFromParent();
+            return;
+            break;
         case BoxLayerForSell::eventType::SELECT:
             _sell_window->select();
             break;
@@ -326,6 +330,9 @@ bool SellContainer::init(){
     _window = CSLoader::createNode("UI/sell_window.csb");
     if(!_window)return false;
     addChild(_window);
+    
+    _window->getChildByName<ui::Button*>("sell");
+    
     
     return true;
 }
