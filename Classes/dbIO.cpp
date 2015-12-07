@@ -14,19 +14,33 @@ USING_NS_CC;
 
 dbIO::dbIO(){
     //DBファイルの保存先のパス
-    auto filePath = FileUtils::getInstance()->getWritablePath();
-    filePath.append("Neco.db");
-    CCLOG("%s",filePath.c_str());
+    std::string use_filePath = FileUtils::getInstance()->fullPathForFilename("Neco.db");
+    CCLOG("use database: %s",use_filePath.c_str());
     
-    //OPEN
-    auto status = sqlite3_open(filePath.c_str(), &useDataBase);
+    std::string writable_filepath = FileUtils::getInstance()->getWritablePath() + "UserData.db";
     
-    //ステータスが0以外の場合はエラーを表示
-    if (status != SQLITE_OK){
-        CCLOG("opne failed : %s", errorMessage);
-        exit(1);
-    }else{
-        CCLOG("open sucessed");
+    {
+        auto status = sqlite3_open_v2(use_filePath.c_str(),&useDataBase,SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,nullptr);
+        
+        //ステータスが0以外の場合はエラーを表示
+        if (status != SQLITE_OK){
+            CCLOG("opne failed : %s", errorMessage);
+            exit(1);
+        }else{
+            CCLOG("open sucessed");
+        }
+    }
+    
+    {
+        auto status = sqlite3_open_v2(writable_filepath.c_str(),&writableDataBase,SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,nullptr);
+        
+        //ステータスが0以外の場合はエラーを表示
+        if (status != SQLITE_OK){
+            CCLOG("opne failed : %s", errorMessage);
+            exit(1);
+        }else{
+            CCLOG("open sucessed");
+        }
     }
     
 }
@@ -34,7 +48,7 @@ dbIO::dbIO(){
 bool dbIO::createTable(std::string str){
     int status;
     
-    status = sqlite3_exec(useDataBase, str.c_str(), NULL, NULL, &errorMessage );
+    status = sqlite3_exec(writableDataBase, str.c_str(), NULL, NULL, &errorMessage );
     if( status != SQLITE_OK ){
         CCLOG("create table failed : %s", errorMessage);
         return false;
@@ -44,6 +58,7 @@ bool dbIO::createTable(std::string str){
 }
 
 bool dbIO::insertTable(std::string){
+    /*
     int status;
     
     auto insert_sql = "INSERT INTO cat(id,name, discription) VALUES(1,'neco1', 'first neco')";
@@ -52,13 +67,14 @@ bool dbIO::insertTable(std::string){
         CCLOG("insert failed : %s", errorMessage);
         return false;
     }
+     */
     return true;
 }
 
-bool dbIO::queryTable(std::string str){
+bool dbIO::queryTableWritable(std::string str){
     int status;
     auto sql = str;
-    status = sqlite3_exec(useDataBase, sql.c_str() , NULL, NULL, &errorMessage);
+    status = sqlite3_exec(writableDataBase, sql.c_str() , NULL, NULL, &errorMessage);
     if( status != SQLITE_OK ){
         CCLOG("query failed : %s \n query details: %s", errorMessage, str.c_str());
         return false;

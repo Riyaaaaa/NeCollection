@@ -18,7 +18,7 @@ struct Cat{
     Cat()=default;
     
     static std::string neko_id_to_string(int id){
-        return "cat/neko" + ((id < 10) ? "0" + std::to_string(0) : std::to_string(0)) + ".png";
+        return "cat/neko" + ((id < 10) ? "0" + std::to_string(id) : std::to_string(id)) + ".png";
     }
     
     CC_SYNTHESIZE(int, _id, Id);

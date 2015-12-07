@@ -53,8 +53,8 @@ UserData::UserData(){
 
 void UserData::addCats(int id){
     auto* db = dbIO::getInstance();
-    db->queryTable("insert into catbox (date,cat_id) values(datetime('now')," + std::to_string(id) + ")");
-    db->queryTable("update catbox set isObtain = 1 where id = " + std::to_string(id) + ";");
+    db->queryTableWritable("insert into catbox (date,cat_id) values(datetime('now')," + std::to_string(id) + ")");
+    db->queryTableWritable("update cat_isobtain set isObtain = 1 where id = " + std::to_string(id) + ";");
     _cat_box.push_back(id);
 }
 

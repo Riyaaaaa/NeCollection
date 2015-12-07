@@ -36,11 +36,16 @@ bool BoxLayer::init(){
     Sprite* retButton = Sprite::create("utility/utility_ui.png",Rect(params::L_ARROW_X,params::L_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
     _layer->addChild(retButton);
     retButton->setAnchorPoint(Vec2(0,0.5));
-    retButton->setPosition(Vec2(0,_layer->getChildByName("title")->getPosition().y));
+    retButton->setPosition(Vec2(50,
+                                Director::getInstance()->getVisibleSize().height -
+                                    _layer->getChildByName("title")->getContentSize().height/2
+                                )
+                           );
     
-    lisener = EventListenerTouchOneByOne::create();
+    auto lisener = EventListenerTouchOneByOne::create();
     lisener->onTouchBegan = [=](Touch* touch,Event* event){
-        this->removeFromParent();
+        if( retButton->getBoundingBox().containsPoint(touch->getLocation()))
+            if(this->_callback){this->_callback(eventType::CLOSE); this->removeFromParent();}
         return true;
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
@@ -60,16 +65,6 @@ bool BoxLayer::initCats(){
     _dictionary_bg->setPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
     _dictionary_bg->setDirection(ui::ScrollView::Direction::VERTICAL);
     _layer->addChild(_dictionary_bg);
-    
-    innerContainer = LayerColor::create(Color4B(128,128,128,128));
-    innerContainer->setAnchorPoint(Vec2(0,1));
-    
-    _dictionary_bg->addChild(innerContainer,0,"container");
-    
-    _dictionary_bg->setContentSize(Size(visibleSize.width,visibleSize.height
-                                       -_layer->getChildByName("title")->getContentSize().height));
-    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
-    //_dictionary_bg->setInnerContainerPosition(Vec2(0,_dictionary_bg->getContentSize().height));
     
     _dictionary_bg->setName("scrollview");
     
@@ -102,14 +97,24 @@ bool BoxLayerForSell::init(int max_select_cats){
     Size visual_size = innerContainer->getContentSize();
     const int CONTENTS_MARGIN = 20;
     
+    innerContainer = LayerColor::create(Color4B(128,128,128,128));
+    innerContainer->setAnchorPoint(Vec2(0,1));
+    
     innerContainer->setContentSize(Size(visibleSize.width,
                                         (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
                                         )
                                    );
+    _dictionary_bg->addChild(innerContainer,0,"container");
+    
     _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
                                                 (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
                                                 )
                                           );
+    
+    _dictionary_bg->setContentSize(Size(visibleSize.width,visibleSize.height
+                                        -_layer->getChildByName("title")->getContentSize().height
+                                        /*-_layer->getChildByName("Menu")->getContentSize().height*/));
+    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
     
     for(int i=0; i<_cat_list.size();){
         for(int j=0; j<3 && i<_cat_list.size() ; j++){
@@ -121,6 +126,7 @@ bool BoxLayerForSell::init(int max_select_cats){
             visual_contents->setPosition(Vec2((visual_size.width/3) * j + CONTENTS_MARGIN,
                                               visual_size.height - (contents_size.height + CONTENTS_MARGIN) * (i/3)));
             
+            /* event of selection a visual content  */
             visual_contents->addClickEventListener([=](Ref* ref){
                 if(!visual_contents->getSelect() && _number_of_selected_cats == _max_select_cats){
                     //todo max select

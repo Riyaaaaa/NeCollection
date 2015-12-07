@@ -18,6 +18,11 @@ class BoxLayer : public cocos2d::Layer{
 public:
     static BoxLayer* create();
     virtual bool init();
+    enum eventType{
+        CLOSE=0
+    };
+    
+    void setCallback(std::function<void(int)> callback){ _callback = callback;};
     
 protected:
     bool initCats();
@@ -28,6 +33,8 @@ protected:
     cocos2d::Node* _layer;
     cocos2d::ui::ScrollView* _dictionary_bg;
     cocos2d::Node* innerContainer;
+    
+    std::function<void(int)> _callback;
 };
 
 class BoxLayerForSell : public BoxLayer{
@@ -35,12 +42,10 @@ public:
     static BoxLayerForSell* create(int max_select_cats);
     virtual bool init(int max_select_cats);
     enum eventType{
-        SELECT=0,
-        DESELECT,
-        CLOSE,
+        CLOSE=0,
+        SELECT,
+        DESELECT
     };
-    
-    void setCallback(std::function<void(eventType)> callback){ _callback = callback;};
     
     CC_SYNTHESIZE_READONLY(std::vector<Cat>, _cat_list, CatList);
     CC_SYNTHESIZE_READONLY(std::vector<int>, _selected_cats, SelectedCats);
@@ -48,7 +53,6 @@ public:
 private:
     int _max_select_cats;
     int _number_of_selected_cats;
-    std::function<void(eventType)> _callback;
 };
 
 class BoxLayerForVisual : public BoxLayer{

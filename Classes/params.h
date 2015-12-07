@@ -10,7 +10,8 @@
 #define params_h
 
 enum params{
-    NUMBER_OF_CATS=10,
+    NUMBER_OF_CATS=15,
+    NUMBER_OF_PRODUCTS=9,
     UTILITY_SIZE = 50,
     VISUAL_CONTENTS_SIZE=200,
     L_ARROW_X = 0,

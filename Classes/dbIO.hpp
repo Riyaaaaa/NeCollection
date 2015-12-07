@@ -20,7 +20,7 @@ public:
     bool createTable(std::string);
     bool insertTable(std::string);
     
-    bool queryTable(std::string);
+    bool queryTableWritable(std::string);
     
     /* query to cat table */
     bool insertCat(int id,std::string name,std::string discription);
@@ -45,6 +45,7 @@ private:
     dbIO(const dbIO& rhs)=default;
     
     sqlite3* useDataBase = nullptr;
+    sqlite3* writableDataBase = nullptr;
     char* errorMessage = nullptr;
 };
 
