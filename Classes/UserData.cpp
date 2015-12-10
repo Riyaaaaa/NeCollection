@@ -58,7 +58,30 @@ void UserData::addCats(int id){
     _cat_box.push_back(id);
 }
 
+bool UserData::removeCats(int index){
+    auto* db = dbIO::getInstance();
+    db->queryTableWritable("delete from catbox where id=" + std::to_string(index) + ";");
+    return false;
+}
+
+bool UserData::removeCats(std::vector<int> indexes){
+    auto* db = dbIO::getInstance();
+    
+    std::sort( indexes.begin(), indexes.end(), std::greater<>() );
+    
+    for(int i=0; i<indexes.size(); i++){
+        db->queryTableWritable("delete from catbox where id=" + std::to_string(indexes[i]) + ";");
+        _cat_box.erase( _cat_box.begin() + indexes[i] );
+    }
+    return true;
+}
+
 void UserData::setMoney(int money){
     UserDefault::getInstance()->setIntegerForKey("money", money);
     _money = money;
+}
+
+void UserData::addMoney(int money){
+    UserDefault::getInstance()->setIntegerForKey("money", _money + money);
+    _money += money;
 }

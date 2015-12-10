@@ -6,7 +6,6 @@
         <Image Name="start1.png" />
         <Image Name="start2.png" />
         <Project Name="TitleScene.csd" Type="Scene" />
-        <Image Name="title.png" />
         <Folder Name="UI">
           <Image Name="battle.png" />
           <Image Name="dictionary.png" />
@@ -26,8 +25,12 @@
           <Image Name="yes_disenable.png" />
           <Image Name="yes_pressed.png" />
           <Project Name="sell_window.csd" Type="Layer" />
-          <Image Name="cat_active.png" />
-          <Image Name="cat_gray.png" />
+          <Project Name="Title.csd" Type="Layer" />
+          <Image Name="window_plate.png" />
+          <Image Name="start_normal.png" />
+          <Image Name="start_pushed.png" />
+          <Image Name="sold_active.png" />
+          <Image Name="sold_gray.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
@@ -61,6 +64,7 @@
           <Project Name="VisualScene.csd" Type="Scene" />
           <Project Name="VisualCat.csd" Type="Layer" />
           <Image Name="NoImage.png" />
+          <Image Name="background.png" />
         </Folder>
         <Folder Name="utility">
           <Image Name="utility_ui.png" />
@@ -69,6 +73,7 @@
           <Project Name="BoxLayer.csd" Type="Layer" />
         </Folder>
         <Image Name="neko00.png" />
+        <Image Name="title.png" />
       </RootFolder>
     </Group>
   </SolutionFolder>

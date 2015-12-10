@@ -17,10 +17,16 @@
 class UserData{
 public:
     static UserData* getInstance(){ static UserData obj; return &obj;}
+    
     void addCats(int id);
-    std::vector<Cat>& getCats(){return _cat_box;};
+    bool removeCats(int index);
+    bool removeCats(std::vector<int> indexes);
+    
+    const std::vector<Cat>& getCats()const {return _cat_box;};
+    std::vector<Cat> getCats(){return _cat_box;};
     void setMoney(int money);
     int getMoney(){ return _money; };
+    void addMoney(int money);
 private:
     void saveFile();
     void loadFile();

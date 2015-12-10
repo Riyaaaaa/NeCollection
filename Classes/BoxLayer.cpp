@@ -11,10 +11,10 @@
 
 USING_NS_CC;
 
-BoxLayer* BoxLayer::create(){
+BoxLayer* BoxLayer::create(Size size){
     BoxLayer* pRet = new BoxLayer();
     
-    if(pRet && pRet->init()){
+    if(pRet && pRet->init(size)){
         pRet->autorelease();
         return pRet;
     }
@@ -25,56 +25,35 @@ BoxLayer* BoxLayer::create(){
     }
 }
 
-bool BoxLayer::init(){
-    if(!Layer::init()){
+bool BoxLayer::init(Size size){
+    if(!Node::init()){
         return false;
     }
     
-    _layer = CSLoader::getInstance()->createNode("box/BoxLayer.csb");
-    addChild(_layer);
-
-    Sprite* retButton = Sprite::create("utility/utility_ui.png",Rect(params::L_ARROW_X,params::L_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
-    _layer->addChild(retButton);
-    retButton->setAnchorPoint(Vec2(0,0.5));
-    retButton->setPosition(Vec2(50,
-                                Director::getInstance()->getVisibleSize().height -
-                                    _layer->getChildByName("title")->getContentSize().height/2
-                                )
-                           );
-    
-    auto lisener = EventListenerTouchOneByOne::create();
-    lisener->onTouchBegan = [=](Touch* touch,Event* event){
-        if( retButton->getBoundingBox().containsPoint(touch->getLocation()))
-            if(this->_callback){this->_callback(eventType::CLOSE); this->removeFromParent();}
-        return true;
-    };
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(lisener,this);
-    
-    if(!initCats()){
-        return false;
-    }
-    
-    return true;
-}
-
-bool BoxLayer::initCats(){
-    Size visibleSize = Director::getInstance()->getVisibleSize();
+    _size = size;
+    Node::setContentSize(size);
     
     _dictionary_bg = ui::ScrollView::create();
     _dictionary_bg->setAnchorPoint(Vec2(0,1));
-    _dictionary_bg->setPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
+    _dictionary_bg->setPosition(Vec2(0,this->getContentSize().height));
     _dictionary_bg->setDirection(ui::ScrollView::Direction::VERTICAL);
-    _layer->addChild(_dictionary_bg);
+    addChild(_dictionary_bg);
     
     _dictionary_bg->setName("scrollview");
     
     return true;
 }
 
-BoxLayerForSell* BoxLayerForSell::create(int max_select_cats){
+bool BoxLayer::initCats(){
+    
+    
+    return true;
+}
+
+BoxLayerForSell* BoxLayerForSell::create(Size size,int max_select_cats){
     BoxLayerForSell* pRet = new BoxLayerForSell();
     
-    if(pRet && pRet->init(max_select_cats)){
+    if(pRet && pRet->init(size,max_select_cats)){
         pRet->autorelease();
         return pRet;
     }
@@ -85,37 +64,61 @@ BoxLayerForSell* BoxLayerForSell::create(int max_select_cats){
     }
 }
 
-bool BoxLayerForSell::init(int max_select_cats){
+bool BoxLayerForSell::init(Size size,int max_select_cats){
     
-    if(!BoxLayer::init()){
+    if(!BoxLayer::init(size)){
         return false;
     }
     
     _cat_list = UserData::getInstance()->getCats();
     
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Size visual_size = innerContainer->getContentSize();
-    const int CONTENTS_MARGIN = 20;
+    initInnerContainer();
+    initDictionary();
     
+    _max_select_cats = max_select_cats;
+    return true;
+}
+
+bool BoxLayerForSell::initDictionary(){
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    /* init dictionary bg */
+    _dictionary_bg->setInnerContainerSize( innerContainer->getContentSize() );
+    
+    _dictionary_bg->setContentSize(_size);
+    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-getContentSize().height));
+    
+    return true;
+}
+
+bool BoxLayerForSell::initInnerContainer(){
+    /* init inner container */
     innerContainer = LayerColor::create(Color4B(128,128,128,128));
     innerContainer->setAnchorPoint(Vec2(0,1));
+    
+    initContents();
+    
+    _dictionary_bg->addChild(innerContainer,0,"container");
+    return true;
+}
+
+bool BoxLayerForSell::initContents(){
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const int CONTENTS_MARGIN = 20;
+    
+    innerContainer->removeAllChildrenWithCleanup(true);
     
     innerContainer->setContentSize(Size(visibleSize.width,
                                         (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
                                         )
                                    );
-    _dictionary_bg->addChild(innerContainer,0,"container");
+    if(innerContainer->getContentSize().height < visibleSize.height-getContentSize().height){
+        innerContainer->setContentSize(Size(visibleSize.width,
+                                            visibleSize.height-getContentSize().height)
+                                       );
+    }
     
-    _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
-                                                (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
-                                                )
-                                          );
-    
-    _dictionary_bg->setContentSize(Size(visibleSize.width,visibleSize.height
-                                        -_layer->getChildByName("title")->getContentSize().height
-                                        /*-_layer->getChildByName("Menu")->getContentSize().height*/));
-    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-_layer->getChildByName("title")->getContentSize().height));
-    
+    Size visual_size = innerContainer->getContentSize();
     for(int i=0; i<_cat_list.size();){
         for(int j=0; j<3 && i<_cat_list.size() ; j++){
             auto file_path = Cat::neko_id_to_string(_cat_list[i].getId());
@@ -144,29 +147,50 @@ bool BoxLayerForSell::init(int max_select_cats){
                     _number_of_selected_cats++;
                 }
             });
-
+            
             
             i++;
         }
     }
-
-    _max_select_cats = max_select_cats;
+    _dictionary_bg->scrollToPercentVertical(0, 0.1, false);
     return true;
 }
 
-bool BoxLayerForVisual::init(){
+void BoxLayerForSell::removeSelectedCats(){
+    
+    UserData::getInstance()->removeCats(_selected_cats);
+    _selected_cats.clear();
+    _cat_list = UserData::getInstance()->getCats();
+    initContents();
+    initDictionary();
+    
+}
+
+BoxLayerForVisual* BoxLayerForVisual::create(Size size){
+    BoxLayerForVisual* pRet = new BoxLayerForVisual();
+    
+    if(pRet && pRet->init(size)){
+        pRet->autorelease();
+        return pRet;
+    }
+    else{
+        delete  pRet;
+        pRet = NULL;
+        return NULL;
+    }
+}
+
+bool BoxLayerForVisual::init(Size size){
+    if(!BoxLayer::init(size)){
+        return false;
+    }
+    
+    innerContainer = LayerColor::create(Color4B(128,128,128,128));
+    innerContainer->setAnchorPoint(Vec2(0,1));
+    
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Size visual_size = innerContainer->getContentSize();
     const int CONTENTS_MARGIN = 20;
-    
-    innerContainer->setContentSize(Size(visibleSize.width,
-                                        (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
-                                        )
-                                   );
-    _dictionary_bg->setInnerContainerSize( Size(visibleSize.width,
-                                                (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (NUMBER_OF_CATS/3+1)
-                                                )
-                                          );
     
     for(int i=0; i<params::NUMBER_OF_CATS;){
         for(int j=0; j<3 && i<params::NUMBER_OF_CATS ; j++){
@@ -180,7 +204,13 @@ bool BoxLayerForVisual::init(){
             i++;
         }
     }
+    _dictionary_bg->addChild(innerContainer,0,"container");
     
+    _dictionary_bg->setInnerContainerSize( innerContainer->getContentSize() );
+    
+    _dictionary_bg->setContentSize(_size);
+    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-getContentSize().height));
+
     return true;
 }
 

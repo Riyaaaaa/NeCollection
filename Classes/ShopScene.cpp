@@ -76,14 +76,32 @@ bool ShopScene::initUI(){
     ui_layer->getChildByName<ui::Button*>("toy")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TOY);});
     ui_layer->getChildByName<ui::Button*>("futon")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::FUTON);});
     ui_layer->getChildByName<ui::Button*>("trimmer")->addClickEventListener([&](Ref* ref){this->setProducts(PRODUCTS::TRIMMER);});
+    
     _scene->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){
-        _sell_box = BoxLayerForSell::create(10);
-        this->addChild(_sell_box,ZORDER::BOX);
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        
+        _title = CSLoader::getInstance()->createNode("UI/Title.csb");
+        _title->getChildByName<ui::Text*>("label")->setString("ねこボックス");
+        _title->setAnchorPoint(Vec2(0.5,1));
+        _title->setPosition(Vec2( visibleSize.width/2 , visibleSize.height ));
+        this->addChild(_title);
+        
+        _sell_box = BoxLayerForSell::create(Size(visibleSize - Size(0,_title->getContentSize().height))
+                                            ,10);
+
         _sell_box->setCallback(CC_CALLBACK_1(ShopScene::sellCallBack, this));
+        this->addChild(_sell_box,ZORDER::BOX);
+        _sell_box->setAnchorPoint(Vec2(0,1));
+        _sell_box->setPosition(Vec2(0,visibleSize.height-_title->getContentSize().height));
         
         _sell_window = SellContainer::create();
+        _sell_window->getWindow()->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){ this->sellCats(); });
+        _sell_window->getWindow()->getChildByName<ui::Button*>("cancell")->addClickEventListener([=](Ref* ref){ this->_sell_box->removeFromParent();
+            this->_sell_window->removeFromParent();
+        });
         this->addChild(_sell_window,ZORDER::SELL_WINDOW);
     });
+    
     refreshScreen();
     
     return true;
@@ -316,6 +334,21 @@ void ShopScene::sellCallBack(int type){
     _sell_window->setMoney(sum);
 }
 
+void ShopScene::sellCats(){
+    const auto& cat_list = _sell_box->getCatList();
+    const auto& selected_list = _sell_box->getSelectedCats();
+    int sum=0;
+    
+    for(int index: selected_list){
+        sum += (dbIO::getInstance()->getCatById(cat_list[index].getId()).getSellingPrice());
+    }
+    
+    UserData::getInstance()->addMoney(sum);
+    refreshScreen();
+    _sell_box->removeSelectedCats();
+    _sell_window->clear();
+}
+
 ShopScene::~ShopScene(){
     for(long i=0; i<_lineup_products.size(); i++){
         _lineup_products[i]->removeFromParent();
@@ -338,13 +371,20 @@ bool SellContainer::init(){
 }
 
 void SellContainer::select(){
-    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/cat_active.png");
+    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/sold_active.png");
     _current_select++;
 }
 
 void SellContainer::deselect(){
     _current_select--;
-    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/cat_gray.png");
+    _window->getChildByName<Sprite*>( "select" + std::to_string(_current_select))->setTexture("UI/sold_gray.png");
+}
+
+void SellContainer::clear(){
+    _current_select=0;
+    for(int i=0; i<10; i++){
+        _window->getChildByName<Sprite*>( "select" + std::to_string(i))->setTexture("UI/sold_gray.png");
+    }
 }
 
 void SellContainer::setMoney(int money){

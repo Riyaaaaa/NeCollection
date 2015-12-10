@@ -159,11 +159,11 @@ bool AppDelegate::initGame(){
     db->queryTableWritable("create table cat_isobtain(id integer primary key,isObtain integer)");
     
     for(int i=0; i<NUMBER_OF_CATS; i++){
-        db->queryTableWritable("insert into cat_isobtain("+std::to_string(i)+",0)");
+        db->queryTableWritable("insert into cat_isobtain values("+std::to_string(i)+",0)");
     }
     
     for(int i=0; i<NUMBER_OF_PRODUCTS; i++){
-        db->queryTableWritable("insert into productbox("+std::to_string(i)+")");
+        db->queryTableWritable("insert into productbox values("+std::to_string(i)+")");
     }
     
     /* add data to debug    */

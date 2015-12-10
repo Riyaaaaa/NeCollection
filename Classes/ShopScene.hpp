@@ -38,6 +38,7 @@ public:
     //void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
     
     void sellCallBack(int);
+    void sellCats();
     
 private:
     bool initUI();
@@ -67,6 +68,7 @@ private:
     cocos2d::Sprite* _left_arrow=nullptr;
     cocos2d::Sprite* _right_arrow=nullptr;
     
+    cocos2d::Node* _title;
     BoxLayerForSell* _sell_box;
     SellContainer* _sell_window;
     
@@ -82,13 +84,13 @@ public:
     
     void setMoney(int);
     CC_SYNTHESIZE_READONLY(int, _money, Money);
+    CC_SYNTHESIZE(cocos2d::Node*, _window, Window);
     
     void select();
     void deselect();
+    void clear();
 private:
     int _current_select=0;
-    cocos2d::Node* _window;
-
 };
 
 #endif /* ShopScene_hpp */
