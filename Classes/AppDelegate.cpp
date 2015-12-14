@@ -145,8 +145,6 @@ bool AppDelegate::initGame(){
     tiny_data->setBoolForKey("isCommingFuton",false);
     tiny_data->setBoolForKey("isCommingTrimmer",false);
     
-    UserData::getInstance()->setMoney(500);
-    
     /* initialize to debug  */
     db->queryTableWritable("update products set isObtain = 0;");
     db->queryTableWritable("drop table catbox");
@@ -165,6 +163,8 @@ bool AppDelegate::initGame(){
     for(int i=0; i<NUMBER_OF_PRODUCTS; i++){
         db->queryTableWritable("insert into productbox values("+std::to_string(i)+")");
     }
+    
+    UserData::getInstance()->setMoney(500);
     
     /* add data to debug    */
     for(int i=0; i<NUMBER_OF_CATS; i++){

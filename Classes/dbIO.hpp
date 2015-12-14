@@ -36,6 +36,7 @@ public:
     std::vector<int> getPrimaryKeys(std::string table);
     
     std::vector<int> getColumnsInt(std::string table,std::string column);
+    std::vector<int> getColumnsIntWritable(std::string table,std::string column);
     std::vector<std::string> getColumnsText(std::string table,std::string column);
     
     ~dbIO();

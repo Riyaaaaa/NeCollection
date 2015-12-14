@@ -31,7 +31,7 @@ void UserData::saveFile(){
 
 void UserData::loadFile(){
     auto* db = dbIO::getInstance();
-    std::vector<int> keys = db->getColumnsInt("catbox","cat_id");
+    std::vector<int> keys = db->getColumnsIntWritable("catbox","cat_id");
     
     _cat_box.clear();
     _cat_box.resize(keys.size());

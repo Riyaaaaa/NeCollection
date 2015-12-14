@@ -136,7 +136,7 @@ void ShopScene::setProducts(PRODUCTS identify){
         _lineup_products[i]->setAnchorPoint(Vec2(0.5,0.5));
     }
     
-    for(long i=0; i<_lineup_products.size() && i<3; i++){
+    for(long i=0; i<_lineup_products.size() && i<2; i++){
         addChild(_lineup_products[i]);
         _lineup_products[i]->setPosition(Vec2((Director::getInstance()->getVisibleSize().width/2)*(i+1),LINEUP_HEIGHT));
     }
@@ -251,16 +251,31 @@ bool ShopScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
         if(pos.x > size.width/2){
             //lineup move right
             if(_current_products < _lineup_products.size()-1){
-                if(_current_products!=0)animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 1],MoveTo::create(0.5f,Vec2(-size.width/2,LINEUP_HEIGHT))));
-                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
-                auto remove = RemoveSelf::create();
-                remove->setTarget(_lineup_products[_current_products + 1]);
-                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_products + 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
+                auto* right_slider = MoveBy::create(0.5f,Vec2(-size.width/2,0));
                 
-                if(_current_products < _lineup_products.size() - 2){
+                if(_current_products!=0){
+                    auto remove = RemoveSelf::create();
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 1],
+                                                               Sequence::create(
+                                                                                right_slider->clone(),
+                                                                                remove,
+                                                                                nullptr
+                                                                                )
+                                                               )
+                                        );
+                }
+                
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],right_slider->clone()));
+                
+                
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 1],right_slider->clone()));
+                
+                if(_current_products < static_cast<int>(_lineup_products.size()) - 2){
                     addChild(_lineup_products[_current_products + 2]);
-                    _lineup_products[_current_products + 2],setPosition(Vec2(size.width*1.5f,LINEUP_HEIGHT));
-                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 2],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
+                    _lineup_products[_current_products + 2]->setPosition(Vec2(size.width*1.5f,LINEUP_HEIGHT));
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 2],
+                                                               right_slider->clone())
+                                        );
                 }
                 
                 runAction(Spawn::create(animations));
@@ -270,16 +285,28 @@ bool ShopScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
             
         }
         else {
+            auto* left_slide = MoveBy::create(0.5f,Vec2(size.width/2,0));
             //lineup move left
             if(_current_products > 0){
-                if(_current_products != _lineup_products.size()-1)animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 1],MoveTo::create(0.5f,Vec2(size.width*1.5f,LINEUP_HEIGHT))));
-                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],MoveTo::create(0.5f,Vec2(size.width,LINEUP_HEIGHT))));
-                animations.pushBack(Sequence::create(TargetedAction::create(_lineup_products[_current_products - 1],MoveTo::create(0.5f, Vec2(size.width/2,LINEUP_HEIGHT))),nullptr));
+                if(_current_products != _lineup_products.size()-1){
+                    auto remove = RemoveSelf::create();
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products + 1],
+                                                               Sequence::create(
+                                                                                left_slide->clone(),
+                                                                                remove,
+                                                                                nullptr
+                                                                                )
+                                                               )
+                                        );
+                }
+                
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products],left_slide->clone()));
+                animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 1],left_slide->clone()));
                 
                 if(_current_products > 1){
                     addChild(_lineup_products[_current_products - 2]);
-                    _lineup_products[_current_products - 2],setPosition(Vec2(-size.width/2,LINEUP_HEIGHT));
-                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 2],MoveTo::create(0.5f,Vec2(0,LINEUP_HEIGHT))));
+                    _lineup_products[_current_products - 2]->setPosition(Vec2(-size.width/2,LINEUP_HEIGHT));
+                    animations.pushBack(TargetedAction::create(_lineup_products[_current_products - 2],left_slide->clone()));
                 }
                 
                 runAction(Spawn::create(animations));

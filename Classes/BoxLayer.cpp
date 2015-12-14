@@ -84,9 +84,8 @@ bool BoxLayerForSell::initDictionary(){
 
     /* init dictionary bg */
     _dictionary_bg->setInnerContainerSize( innerContainer->getContentSize() );
-    
-    _dictionary_bg->setContentSize(_size);
-    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-getContentSize().height));
+    _dictionary_bg->setInnerContainerPosition( Vec2(0,_size.height) );
+
     
     return true;
 }
@@ -112,10 +111,8 @@ bool BoxLayerForSell::initContents(){
                                         (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
                                         )
                                    );
-    if(innerContainer->getContentSize().height < visibleSize.height-getContentSize().height){
-        innerContainer->setContentSize(Size(visibleSize.width,
-                                            visibleSize.height-getContentSize().height)
-                                       );
+    if(innerContainer->getContentSize().height < _size.height){
+        innerContainer->setContentSize(_size);
     }
     
     Size visual_size = innerContainer->getContentSize();
@@ -209,7 +206,7 @@ bool BoxLayerForVisual::init(Size size){
     _dictionary_bg->setInnerContainerSize( innerContainer->getContentSize() );
     
     _dictionary_bg->setContentSize(_size);
-    _dictionary_bg->setInnerContainerPosition(Vec2(0,visibleSize.height-getContentSize().height));
+    _dictionary_bg->setInnerContainerPosition(Vec2(0,getContentSize().height));
 
     return true;
 }

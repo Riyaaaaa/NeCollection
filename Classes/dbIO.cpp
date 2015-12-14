@@ -263,6 +263,27 @@ std::vector<int> dbIO::getColumnsInt(std::string table,std::string column){
     return columns;
 }
 
+std::vector<int> dbIO::getColumnsIntWritable(std::string table,std::string column){
+    std::vector<int> columns;
+    std::string sql = "select " + column + " from " + table;
+    sqlite3_stmt *stmt=nullptr;
+    sqlite3_prepare(writableDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    
+    sqlite3_reset(stmt);
+    
+    int r;
+    while(SQLITE_ROW == (r=sqlite3_step(stmt))){
+        columns.push_back(sqlite3_column_int(stmt, 0));
+    }
+    if(r != SQLITE_DONE){
+        CCLOG("SELECT ERROR");
+    }
+    
+    sqlite3_finalize(stmt);
+    return columns;
+}
+
+
 std::vector<std::string> dbIO::getColumnsText(std::string table,std::string column){
     std::vector<std::string> columns;
     std::string sql = "select " + column + " from " + table;
@@ -285,4 +306,5 @@ std::vector<std::string> dbIO::getColumnsText(std::string table,std::string colu
 
 dbIO::~dbIO(){
     sqlite3_close(useDataBase);
+    sqlite3_close(writableDataBase);
 }
