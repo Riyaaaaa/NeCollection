@@ -31,6 +31,8 @@
           <Image Name="start_pushed.png" />
           <Image Name="sold_active.png" />
           <Image Name="sold_gray.png" />
+          <Project Name="Confirm_Window.csd" Type="Layer" />
+          <Project Name="Redecoration_Window.csd" Type="Layer" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
@@ -74,6 +76,7 @@
         </Folder>
         <Image Name="neko00.png" />
         <Image Name="title.png" />
+        <TTF Name="micachan.ttf" />
       </RootFolder>
     </Group>
   </SolutionFolder>

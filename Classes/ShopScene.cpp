@@ -13,6 +13,7 @@
 #include "UserData.hpp"
 #include "cocostudio/CocoStudio.h"
 #include "Utility.hpp"
+#include "ModalWindow.hpp"
 
 USING_NS_CC;
 
@@ -20,7 +21,6 @@ Scene* ShopScene::createScene()
 {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
-    Size size = Director::getInstance()->getVisibleSize();
     
     scene->addChild(ShopScene::create(),SCENE,"ShopScene");
     
@@ -95,9 +95,13 @@ bool ShopScene::initUI(){
         _sell_box->setPosition(Vec2(0,visibleSize.height-_title->getContentSize().height));
         
         _sell_window = SellContainer::create();
-        _sell_window->getWindow()->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){ this->sellCats(); });
+        _sell_window->getWindow()->getChildByName<ui::Button*>("sell")->addClickEventListener([=](Ref* ref){
+            this->sellCats();
+        });
+        
         _sell_window->getWindow()->getChildByName<ui::Button*>("cancell")->addClickEventListener([=](Ref* ref){ this->_sell_box->removeFromParent();
             this->_sell_window->removeFromParent();
+            this->_title->removeFromParent();
         });
         this->addChild(_sell_window,ZORDER::SELL_WINDOW);
     });
@@ -190,41 +194,26 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
     int money = UserData::getInstance()->getMoney();
     
     if(_lineup_products[_current_products]->getBoundingBox().containsPoint(touch->getLocation())){
-        Layer* modal_layer = LayerColor::create( Color4B(0,0,0,128) );
-        addChild(modal_layer,MODAL_LAYER,"modal_layer");
+        Buy_Confirm_Window* buy_window = Buy_Confirm_Window::create(_products_list[_current_products].price);
+        addChild(buy_window,MODAL_LAYER,"modal_layer");
         
-        Node* modal_window = CSLoader::getInstance()->createNode("shop/Buy_Window.csb");
-        modal_layer->addChild(modal_window);
+        buy_window->setPosition(Point::ZERO);
         
-        modal_window->setAnchorPoint(Vec2(0.5,0.5));
-        modal_window->setPosition(modal_layer->getContentSize()/2);
-        
-        modal_window->getChildByName<ui::Text*>("before_money")->setString(std::to_string(money));
-        modal_window->getChildByName<ui::Text*>("after_money")->setString(std::to_string(money - _products_list[_current_products].price));
-        modal_window->getChildByName<Sprite*>("product")->setTexture("products/" + fill_zero(_products_list[_current_products].id) + ".png");
-        
-        modal_window->getChildByName<ui::Button*>("no")->addClickEventListener([=](Ref* ref){modal_layer->removeFromParent();});
-        
-        if(UserData::getInstance()->getMoney() < _products_list[_current_products].price){
-            modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::RED);
-            modal_window->getChildByName<ui::Button*>("yes")->setEnabled(false);
-        }
-        else{
-            modal_window->getChildByName<ui::Text*>("after_money")->setTextColor(Color4B::BLUE);
-            modal_window->getChildByName<ui::Button*>("yes")->addClickEventListener([=](Ref* ref){
+        buy_window->setContent(_products_list[_current_products]);
+
+        buy_window->setCallBackYes( [=](Ref* ref){
                 this->soldOut(_lineup_products[_current_products]);
                 dbIO::getInstance()->queryTableWritable("insert into productbox values(" + std::to_string(_products_list[_current_products].id) + ");");
                 UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
-                modal_layer->removeFromParent();
+                buy_window->removeFromParent();
                 this->refreshScreen();
             });
-        }
         
         auto listner = EventListenerTouchOneByOne::create();
         listner->setSwallowTouches(true);
         listner->onTouchBegan = [](Touch*,Event*){return true;};
         
-        _eventDispatcher->addEventListenerWithSceneGraphPriority(listner,modal_layer);
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(listner,buy_window);
         
         return true;
     }
@@ -391,9 +380,6 @@ bool SellContainer::init(){
     if(!_window)return false;
     addChild(_window);
     
-    _window->getChildByName<ui::Button*>("sell");
-    
-    
     return true;
 }
 
@@ -417,4 +403,5 @@ void SellContainer::clear(){
 void SellContainer::setMoney(int money){
     _money = money;
     _window->getChildByName<ui::Text*>("money")->setString(std::to_string(money));
+    
 }

@@ -84,9 +84,9 @@ bool BoxLayerForSell::initDictionary(){
 
     /* init dictionary bg */
     _dictionary_bg->setInnerContainerSize( innerContainer->getContentSize() );
-    _dictionary_bg->setInnerContainerPosition( Vec2(0,_size.height) );
-
     
+    _dictionary_bg->setContentSize(_size);
+    _dictionary_bg->setInnerContainerPosition(Vec2(0,_size.height));
     return true;
 }
 
@@ -98,6 +98,8 @@ bool BoxLayerForSell::initInnerContainer(){
     initContents();
     
     _dictionary_bg->addChild(innerContainer,0,"container");
+    
+    initDictionary();
     return true;
 }
 
@@ -106,7 +108,7 @@ bool BoxLayerForSell::initContents(){
     const int CONTENTS_MARGIN = 20;
     
     innerContainer->removeAllChildrenWithCleanup(true);
-    
+  
     innerContainer->setContentSize(Size(visibleSize.width,
                                         (VISUAL_CONTENTS_SIZE + CONTENTS_MARGIN) * (_cat_list.size()/3+1)
                                         )
@@ -114,7 +116,7 @@ bool BoxLayerForSell::initContents(){
     if(innerContainer->getContentSize().height < _size.height){
         innerContainer->setContentSize(_size);
     }
-    
+   
     Size visual_size = innerContainer->getContentSize();
     for(int i=0; i<_cat_list.size();){
         for(int j=0; j<3 && i<_cat_list.size() ; j++){
