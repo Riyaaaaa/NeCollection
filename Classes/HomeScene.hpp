@@ -9,6 +9,7 @@
 #ifndef HomeScene_hpp
 #define HomeScene_hpp
 
+#include <array>
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
@@ -38,13 +39,6 @@ public:
     void saveObjectStatus();
     
 protected:
-    enum class CAT_OBJECT{
-        TOY=0,
-        FUTON,
-        MEAL,
-        TRIMMER
-    };
-    
     enum ZOrder{
         SCENE=0
     };
@@ -55,9 +49,9 @@ protected:
     
     //std::vector<std::unique_ptr<CatObject>> _cat_objects;
     std::vector<cocos2d::ui::Button*> _cat_objects;
+    std::array< CatObjectStatus, params::NUMBER_OF_PRODUCT_TYPES > _cat_object_status;
     
-    static void disenableCatObject(cocos2d::ui::Button*);
-    void enableCatObject(cocos2d::ui::Button*);
+    void setEnableCatObject(bool,PRODUCTS);
     
     
     bool initStatus();
@@ -67,9 +61,9 @@ protected:
     void getCat(int id);
     
     void replaceSceneWithName(std::string);
+    void setCatObject(PRODUCTS product,int id);
     
     void update(float dt);
-    
     int lotteryCat();
     
     int _remain_event_time=600;

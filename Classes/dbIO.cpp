@@ -180,19 +180,19 @@ std::vector<Products> dbIO::getProductAll(){
 std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
     std::vector<Products> list;
     std::string sql = "select * from products where type='" + std::to_string(static_cast<int>(type)) + "'";
+    
     sqlite3_stmt *stmt=nullptr;
     sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
-    
     sqlite3_reset(stmt);
     
     int r;
     while(SQLITE_ROW == (r=sqlite3_step(stmt))){
         list.push_back(Products());
         list.back().id = sqlite3_column_int(stmt, 0);
-        list.back().isObtain = sqlite3_column_int(stmt, 1);
-        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 3));
-        list.back().price = sqlite3_column_int(stmt, 4);
+        list.back().name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        list.back().type = static_cast<PRODUCTS>(sqlite3_column_int(stmt, 2));
+        list.back().price = sqlite3_column_int(stmt, 3);
+        list.back().isObtain = getProductIsObtain(list.back().id);
     }
     if(r != SQLITE_DONE){
         CCLOG("SELECT ERROR");
@@ -204,9 +204,9 @@ std::vector<Products> dbIO::getProductTypeAll(PRODUCTS type){
 
 bool dbIO::getProductIsObtain(int id){
     bool isObtain;
-    std::string sql = "select isObtain from products where id='" + std::to_string(id) + "'";
+    std::string sql = "select isObtain from productbox where id='" + std::to_string(id) + "'";
     sqlite3_stmt *stmt=nullptr;
-    sqlite3_prepare(useDataBase, sql.c_str(), sql.size(), &stmt, NULL);
+    sqlite3_prepare(writableDataBase, sql.c_str(), sql.size(), &stmt, NULL);
     
     sqlite3_reset(stmt);
     

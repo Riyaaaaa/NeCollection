@@ -203,7 +203,7 @@ bool ShopScene::buyProducts(cocos2d::Touch *touch, cocos2d::Event *event){
 
         buy_window->setCallBackYes( [=](Ref* ref){
                 this->soldOut(_lineup_products[_current_products]);
-                dbIO::getInstance()->queryTableWritable("insert into productbox values(" + std::to_string(_products_list[_current_products].id) + ");");
+                dbIO::getInstance()->queryTableWritable("update productbox set isObtain = 1 where id = " + std::to_string(_products_list[_current_products].id) + ";");
                 UserData::getInstance()->setMoney(money -_products_list[_current_products].price);
                 buy_window->removeFromParent();
                 this->refreshScreen();

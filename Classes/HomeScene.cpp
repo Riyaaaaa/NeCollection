@@ -86,60 +86,27 @@ void HomeScene::replaceSceneWithName(std::string filename){
 
 bool HomeScene::initStatus(){
     auto* tiny_data = UserDefault::getInstance();
+    cocos2d::Data data = tiny_data->getDataForKey("CatObjectStatuses");
+    memcpy(&_cat_object_status[0], data.getBytes(), data.getSize());
     
-    _cat_objects.resize(4);
+    _cat_objects.resize(params::NUMBER_OF_PRODUCT_TYPES);
+    
+    for(int i=0; i<params::NUMBER_OF_PRODUCT_TYPES; i++){
+        setCatObject(static_cast<PRODUCTS>(i), _cat_object_status[i].id);
+        setEnableCatObject( _cat_object_status[i].isComing, static_cast<PRODUCTS>(i) );
+    }
 
-    _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]
-        = _home_bg->getChildByName<ui::Button*>("toy");
-    _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->addClickEventListener([&](Ref* ref){
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
-        getCat(lotteryCat());
-        }
-                                                                           );
-    if(tiny_data->getBoolForKey("isCommingToy"))
-        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
-    else
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TOY)]);
-    
-    _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]
-        = _home_bg->getChildByName<ui::Button*>("meal");
-    _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->addClickEventListener([&](Ref* ref){
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
-        getCat(lotteryCat());
-    }
-                                                                            );
-    if(tiny_data->getBoolForKey("isCommingMeal"))
-        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
-    else
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]);
-    
-    _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]
-        = _home_bg->getChildByName<ui::Button*>("futon");
-    _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->addClickEventListener([&](Ref* ref){
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
-        getCat(lotteryCat());
-    }
-                                                                             );
-    if(tiny_data->getBoolForKey("isCommingFuton"))
-        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
-    else
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]);
-    
-    
-    _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]
-        = _home_bg->getChildByName<ui::Button*>("trimmer");
-    _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->addClickEventListener([&](Ref* ref){
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
-        getCat(lotteryCat());
-    }
-                                                                               
-                                                                               );
-    if(tiny_data->getBoolForKey("isCommingTrimmer"))
-        enableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
-    else
-        disenableCatObject(_cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]);
-    
     return true;
+}
+
+void HomeScene::setCatObject(PRODUCTS product,int id){
+    
+    _cat_objects[static_cast<int>(product)] = dynamic_cast<ui::Button*>(_home_bg->getChildByTag( 100 + static_cast<int>(product) ));
+    _cat_objects[static_cast<int>(product)]->addClickEventListener([=](Ref* ref){
+        setEnableCatObject(false,product);
+        getCat(lotteryCat());
+    });
+    
 }
 
 void HomeScene::update(float dt){
@@ -160,28 +127,33 @@ void HomeScene::comeCat(){
     std::mt19937 mt(rnd());
     std::uniform_int_distribution<int> dist(0,3);
     
-    CAT_OBJECT index = static_cast<CAT_OBJECT>(dist(mt));
-    auto* target = _cat_objects[static_cast<int>(index)];
+    PRODUCTS index = static_cast<PRODUCTS>(dist(mt));
     
-    if(!target->isEnabled()){
-        enableCatObject(target);
+    if(!_cat_object_status[static_cast<int>(index)].isComing){
+        setEnableCatObject(true,index);
     }
 }
 
-void HomeScene::disenableCatObject(cocos2d::ui::Button* btn){
-    btn->setEnabled(false);
-    auto* alert = btn->getChildByName<Sprite*>("alert");
-    if(alert)alert->removeFromParent();
-}
-
-void HomeScene::enableCatObject(ui::Button* btn){
-    auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
-    btn->setEnabled(true);
-    btn->addChild(alert,1,"alert");
+void HomeScene::setEnableCatObject(bool is_enabled,PRODUCTS identify){
     
-    alert->setPosition(Vec2(btn->getContentSize().width,btn->getContentSize().height));
+    if(is_enabled){
+        auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+        _cat_objects[static_cast<int>(identify)]->setEnabled(true);
+        _cat_object_status[static_cast<int>(identify)].isComing = true;
+        _cat_objects[static_cast<int>(identify)]->addChild(alert,1,"alert");
+        alert->setPosition(Vec2(_cat_objects[static_cast<int>(identify)]->getContentSize().width,
+                                _cat_objects[static_cast<int>(identify)]->getContentSize().height)
+                           );
+    }
+    else{
+        _cat_objects[static_cast<int>(identify)]->setEnabled(false);
+        _cat_object_status[static_cast<int>(identify)].isComing = false;
+        auto* alert = _cat_objects[static_cast<int>(identify)]->getChildByName<Sprite*>("alert");
+        if(alert)alert->removeFromParent();
+    }
+    
+    
 }
-
 void HomeScene::getCat(int id){
     Cat cat = _db->getCatById(id);
     Scene* newScene = Scene::create();
@@ -223,11 +195,11 @@ void HomeScene::saveScheduleTime(){
 
 void HomeScene::saveObjectStatus(){
     auto* tiny_data = UserDefault::getInstance();
+
+    cocos2d::Data data;
+    data.copy(reinterpret_cast<unsigned char*>(&_cat_object_status[0]), sizeof(CatObjectStatus)*4);
     
-    tiny_data->setBoolForKey("isCommingToy", _cat_objects[static_cast<int>(CAT_OBJECT::TOY)]->isEnabled());
-    tiny_data->setBoolForKey("isCommingMeal", _cat_objects[static_cast<int>(CAT_OBJECT::MEAL)]->isEnabled());
-    tiny_data->setBoolForKey("isCommingTrimmer", _cat_objects[static_cast<int>(CAT_OBJECT::TRIMMER)]->isEnabled());
-    tiny_data->setBoolForKey("isCommingFuton", _cat_objects[static_cast<int>(CAT_OBJECT::FUTON)]->isEnabled());
+    tiny_data->setDataForKey("CatObjectStatuses",data);
 }
 
 bool HomeScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){

@@ -38,4 +38,12 @@ class Trimmer : public CatObject{
     
 };
 
+struct CatObjectStatus{
+    CatObjectStatus()=default;
+    CatObjectStatus(bool _isComing,int _id):isComing(_isComing), id(_id){}
+    
+    bool isComing;
+    int id;
+};
+
 #endif /* cat_object_hpp */

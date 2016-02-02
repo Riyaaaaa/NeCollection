@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+cocos2d::Node* TitleScene::_titlescene;
+
 Scene* TitleScene::createScene()
 {
     // 'scene' is an autorelease object
@@ -21,19 +23,19 @@ Scene* TitleScene::createScene()
     titleScene->setPosition(size/2);
      */
     
-    auto titleScene = CSLoader::getInstance()->createNode("res/TitleScene.csb");
+    _titlescene = CSLoader::getInstance()->createNode("res/TitleScene.csb");
     
-    auto* button = titleScene->getChildByName<ui::Button*>("SButton");
+    auto* button = _titlescene->getChildByName<ui::Button*>("SButton");
     button->addClickEventListener([](Ref* ref){
         ((AppDelegate*)Application::getInstance())->launchGame();
     });
     
     CCLOG("%f %f",size.width,size.height);
      
-    titleScene->setContentSize(size);
-    cocos2d::ui::Helper::doLayout(titleScene);
+    _titlescene->setContentSize(size);
+    cocos2d::ui::Helper::doLayout(_titlescene);
     
-    scene->addChild(titleScene);
+    scene->addChild(_titlescene);
 
     // return the scene
     return scene;
@@ -42,17 +44,32 @@ Scene* TitleScene::createScene()
 // on "init" you need to initialize your instance
 bool TitleScene::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !Layer::init() )
-    {
-        return false;
-    }
     
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    beginAnimation();
     
     return true;
+}
+
+void TitleScene::beginAnimation(){
+    
+    
+    cocos2d::Node* neko = _titlescene->getChildByName("neko");
+    
+    Animation *animation = Animation::create();
+    for(int i=1; i<21; i++){
+        animation->addSpriteFrameWithFileName("top_neco/neko" + fill_zero(i) + ".png");
+    }
+    for(int i=20; i>=1; i--){
+        animation->addSpriteFrameWithFileName("top_neco/neko" + fill_zero(i) + ".png");
+    }
+    
+    animation->setRestoreOriginalFrame(true);
+    animation->setDelayPerUnit(0.5f / 4.0f);
+    
+    Animate *animate = Animate::create(animation);
+    RepeatForever *animated = RepeatForever::create(animate);
+    neko->runAction(animated);
+
 }
 
 

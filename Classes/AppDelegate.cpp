@@ -88,6 +88,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     
     FileUtils::getInstance()->addSearchPath("res/");
     auto scene = TitleScene::createScene();
+    dynamic_cast<TitleScene*>(TitleScene::_titlescene)->beginAnimation();
 
     director->runWithScene(scene);
 
@@ -145,23 +146,33 @@ bool AppDelegate::initGame(){
     tiny_data->setBoolForKey("isCommingFuton",false);
     tiny_data->setBoolForKey("isCommingTrimmer",false);
     
+    std::array< CatObjectStatus,4 > data;
+    for(auto&& obj: data)obj.isComing=false;
+    data[static_cast<int>(PRODUCTS::MEAL)].id = 0; data[static_cast<int>(PRODUCTS::TOY)].id = 2;
+    data[static_cast<int>(PRODUCTS::FUTON)].id = 3; data[static_cast<int>(PRODUCTS::TRIMMER)].id = 4;
+    
+    cocos2d::Data cos;
+    cos.copy(reinterpret_cast<unsigned char*>(&data[0]), sizeof(CatObjectStatus)*4);
+    tiny_data->setDataForKey("CatObjectStatuses", cos);
+    
     /* initialize to debug  */
-    db->queryTableWritable("update products set isObtain = 0;");
     db->queryTableWritable("drop table catbox");
     db->queryTableWritable("drop table productbox");
     db->queryTableWritable("drop table cat_isobtain");
     /* end debug code       */
     
     db->queryTableWritable("create table catbox(id integer primary key,date text,cat_id integer)");
-    db->queryTableWritable("create table productbox(id integer primary key);");
+    db->queryTableWritable("create table productbox(id integer primary key,isObtain integer);");
     db->queryTableWritable("create table cat_isobtain(id integer primary key,isObtain integer)");
+    
+    
     
     for(int i=0; i<NUMBER_OF_CATS; i++){
         db->queryTableWritable("insert into cat_isobtain values("+std::to_string(i)+",0)");
     }
     
     for(int i=0; i<NUMBER_OF_PRODUCTS; i++){
-        db->queryTableWritable("insert into productbox values("+std::to_string(i)+")");
+        db->queryTableWritable("insert into productbox values("+std::to_string(i)+",0)");
     }
     
     UserData::getInstance()->setMoney(500);

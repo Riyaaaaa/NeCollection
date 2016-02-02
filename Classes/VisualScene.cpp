@@ -44,7 +44,7 @@ bool VisualScene::init(){
 bool VisualScene::initVisualDictionary(){
     Node* title = _scene->getChildByName("title");
     BoxLayerForVisual* box = BoxLayerForVisual::create(Size(Director::getInstance()->getVisibleSize()
-                                             - Size(0,title->getContentSize().height))
+                                                            - Size(0,title->getContentSize().height) - Size(0,_scene->getChildByName("Menu")->getContentSize().height))
                                           );
     box->setAnchorPoint(Vec2(0,1));
     this->addChild(box);

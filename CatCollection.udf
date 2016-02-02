@@ -40,8 +40,9 @@
           <FilePathData Path="UI/Title.csd" />
           <FilePathData Path="UI/Confirm_Window.csd" />
           <FilePathData Path="UI/Redecoration_Window.csd" />
+          <FilePathData Path="home/HomeScene.csd" />
         </OpenedDocuments>
-        <ActiveDocument Path="UI/Redecoration_Window.csd" />
+        <ActiveDocument Path="home/HomeScene.csd" />
       </Value>
     </Item>
   </Properties>

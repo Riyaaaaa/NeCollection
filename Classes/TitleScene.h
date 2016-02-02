@@ -10,11 +10,15 @@ public:
 
     virtual bool init();
     
+    void beginAnimation();
+    
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
     CREATE_FUNC(TitleScene);
+    
+    static cocos2d::Node* _titlescene;
 };
 
 #endif // __TitleScene_SCENE_H__
