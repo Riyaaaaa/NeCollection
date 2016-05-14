@@ -8,6 +8,7 @@
 
 #include "HomeScene.hpp"
 #include "ShopScene.hpp"
+#include "ModalWindow.hpp"
 #include "VisualScene.hpp"
 #include "params.h"
 #include "Utility.hpp"
@@ -16,25 +17,6 @@
 #include <ctime>
 
 USING_NS_CC;
-
-Scene* HomeScene::createScene()
-{
-    // 'scene' is an autorelease object
-    auto scene = Scene::create();
-    
-    /*
-     auto* titleScene = Sprite::create("title.png");
-     CCLOG("%f %f",titleScene->getContentSize().width,titleScene->getContentSize().height);
-     titleScene->setAnchorPoint(Vec2(0.5,0.5));
-     titleScene->setPosition(size/2);
-     */
-    
-    scene->addChild(HomeScene::create(),SCENE,"HomeScene");
-    
-    // return the scene
-    return scene;
-}
-
 
 bool HomeScene::init()
 {
@@ -69,7 +51,7 @@ bool HomeScene::init()
 
 bool HomeScene::initUI(){
     
-    _scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setText(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")));
+    _scene->getChildByName("MoneyUI")->getChildByName("money_plate")->getChildByName<ui::Text*>("money")->setString(std::to_string(UserDefault::getInstance()->getIntegerForKey("money")));
     
     return true;
 }
@@ -95,17 +77,65 @@ bool HomeScene::initStatus(){
         setCatObject(static_cast<PRODUCTS>(i), _cat_object_status[i].id);
         setEnableCatObject( _cat_object_status[i].isComing, static_cast<PRODUCTS>(i) );
     }
+    
+    auto* redecorate = _scene->getChildByName<ui::Button*>("redecorate");
+    
+    redecorate->addClickEventListener([=](Ref* ref){
+        this->setRedecorateWindow();
+            });
 
     return true;
 }
 
+void HomeScene::setRedecorateWindow(){
+    if(!_redecorate_window){
+        
+        /* crate node from binary files */
+        _redecorate_window = CSLoader::createNode("home/Redecorate_Window.csb");
+        /* set node propaty*/
+        _redecorate_window->ignoreAnchorPointForPosition(false);
+        _redecorate_window->setAnchorPoint(Vec2(0.5,0.5));
+        
+        /* set redecorate window layout */
+        for(int i=0; i<params::NUMBER_OF_PRODUCT_TYPES; i++){
+            Sprite* right_arrow = Sprite::create("utility/utility_ui.png",
+                                                 Rect(params::R_ARROW_X,params::R_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+            Sprite* left_arrow= Sprite::create("utility/utility_ui.png",
+                                               Rect(params::L_ARROW_X,params::L_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+            
+            MenuItemSprite* r_button = MenuItemSprite::create(right_arrow,   right_arrow, [=](Ref*){ CCLOG( "%d th rbutton",i ); }  );
+            MenuItemSprite* l_button = MenuItemSprite::create(left_arrow ,   left_arrow , [=](Ref*){ CCLOG( "%d th lbutton",i ); }  );
+            
+            Node* cat_object = _redecorate_window->getChildByName("Plate")->getChildByTag(100 + i);
+            Vec2 pos = cat_object->getPosition();
+            Size size = cat_object->getContentSize();
+            
+            _redecorate_window->addChild( r_button   );
+            _redecorate_window->addChild( l_button   );
+            
+            r_button->setPosition(   pos - Size( size.width/2, 0 ) - Size(0, size.height/2) );
+            l_button->setPosition(   pos + Size( size.width/2, 0 ) - Size(0, size.height/2) );
+        }
+        
+        addChild(_redecorate_window);
+        _redecorate_window->setPosition( Director::getInstance()->getVisibleSize()/2.0f );
+    }
+    else {
+        _redecorate_window->removeFromParent();
+        _redecorate_window=nullptr;
+    }
+
+}
+
 void HomeScene::setCatObject(PRODUCTS product,int id){
-    
+    /* rerender cat object graphics and set event listener*/
     _cat_objects[static_cast<int>(product)] = dynamic_cast<ui::Button*>(_home_bg->getChildByTag( 100 + static_cast<int>(product) ));
     _cat_objects[static_cast<int>(product)]->addClickEventListener([=](Ref* ref){
         setEnableCatObject(false,product);
         getCat(lotteryCat());
     });
+    _cat_objects[static_cast<int>(product)]->loadTextures("products/"+ fill_zero(id) + ".png",
+                                                          "products/"+ fill_zero(id) + ".png" );
     
 }
 
@@ -135,7 +165,7 @@ void HomeScene::comeCat(){
 }
 
 void HomeScene::setEnableCatObject(bool is_enabled,PRODUCTS identify){
-    
+    /* set enable comming cat event on cat object  */
     if(is_enabled){
         auto* alert = Sprite::create("res/utility/utility_ui.png",Rect(params::ALERT_X,params::ALERT_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
         _cat_objects[static_cast<int>(identify)]->setEnabled(true);
@@ -155,9 +185,12 @@ void HomeScene::setEnableCatObject(bool is_enabled,PRODUCTS identify){
     
 }
 void HomeScene::getCat(int id){
+    /* get cat event */
     Cat cat = _db->getCatById(id);
     Scene* newScene = Scene::create();
     
+    
+    /* todo: add some effects */
     Node* resultScene = (CSLoader::getInstance()->createNode("result/GetResultScene.csb"));
     ui::Text* message = resultScene->getChildByName("Window")->getChildByName<ui::Text*>("Message");
     
@@ -180,6 +213,7 @@ void HomeScene::getCat(int id){
 }
 
 void HomeScene::saveScheduleTime(){
+    /* write scheduling time to plist file */
     auto* tiny_data = UserDefault::getInstance();
     std::time_t timer;
     struct std::tm *t_st;
@@ -194,6 +228,7 @@ void HomeScene::saveScheduleTime(){
 }
 
 void HomeScene::saveObjectStatus(){
+    /* write status of cat object to binary file */
     auto* tiny_data = UserDefault::getInstance();
 
     cocos2d::Data data;
@@ -208,6 +243,7 @@ bool HomeScene::onTouchBegin(cocos2d::Touch* touch,cocos2d::Event* event){
 }
 
 void HomeScene::onTouchMoved(cocos2d::Touch* touch,cocos2d::Event* event){
+    /* move background image */
     Vec2 new_pos = touch->getLocation();
     Vec2 delta_pos = new_pos - _old_pos;
     _old_pos = new_pos;
@@ -226,6 +262,7 @@ void HomeScene::onTouchCancelled(cocos2d::Touch* touch,cocos2d::Event* unused_ev
 }
 
 int HomeScene::lotteryCat(){
+    /* todo: add lottery modules */
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::uniform_int_distribution<> dist(0,params::NUMBER_OF_CATS);

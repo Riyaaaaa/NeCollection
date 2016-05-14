@@ -17,17 +17,6 @@
 
 USING_NS_CC;
 
-Scene* VisualScene::createScene()
-{
-    // 'scene' is an autorelease object
-    auto scene = Scene::create();
-    
-    scene->addChild(VisualScene::create(),SCENE,"VisualScene");
-    
-    // return the scene
-    return scene;
-}
-
 bool VisualScene::init(){
     
     if ( !MainScene::init("dictionary/VisualScene.csb") )

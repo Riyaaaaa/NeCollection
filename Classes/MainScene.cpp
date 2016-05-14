@@ -21,7 +21,7 @@ bool MainScene::initMainMenu(){
         _scene->getChildByName("Menu")->
         getChildByName<ui::Button*>(button)->
         addClickEventListener([=](Ref* ref){
-            auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
+            auto* next_scene = remove_ptr_t<decltype(scene)>::create();
             Director::getInstance()->replaceScene(next_scene);
         });
     };
@@ -33,7 +33,7 @@ bool MainScene::initMainMenu(){
 }
 
 bool MainScene::init(std::string filename){
-    if ( !Layer::init() )
+    if ( !Scene::init() )
     {
         return false;
     }

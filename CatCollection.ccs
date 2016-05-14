@@ -32,7 +32,7 @@
           <Image Name="sold_active.png" />
           <Image Name="sold_gray.png" />
           <Project Name="Confirm_Window.csd" Type="Layer" />
-          <Project Name="Redecoration_Window.csd" Type="Layer" />
+          <Image Name="moyou.png" />
         </Folder>
         <Folder Name="result">
           <Project Name="GetResultScene.csd" Type="Scene" />
@@ -45,6 +45,7 @@
           <Image Name="tumetogi.png" />
           <Project Name="HomeScene.csd" Type="Scene" />
           <Image Name="HomeBG.png" />
+          <Project Name="Redecorate_Window.csd" Type="Layer" />
         </Folder>
         <Folder Name="fonts">
           <TTF Name="arial.ttf" />

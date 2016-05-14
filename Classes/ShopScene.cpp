@@ -17,17 +17,6 @@
 
 USING_NS_CC;
 
-Scene* ShopScene::createScene()
-{
-    // 'scene' is an autorelease object
-    auto scene = Scene::create();
-    
-    scene->addChild(ShopScene::create(),SCENE,"ShopScene");
-    
-    // return the scene
-    return scene;
-}
-
 // on "init" you need to initialize your instance
 bool ShopScene::init()
 {
@@ -55,20 +44,6 @@ bool ShopScene::init()
 }
 
 bool ShopScene::initUI(){
-    auto initMenuButton = [&](auto* scene,std::string button){
-        _scene->getChildByName("Menu")->
-        getChildByName<ui::Button*>(button)->
-        addClickEventListener([=](Ref* ref){
-            auto* next_scene = remove_ptr_t<decltype(scene)>::createScene();
-            Director::getInstance()->replaceScene(next_scene);
-        });
-    };
-    
-    initMenuButton( reinterpret_cast<HomeScene*>(0),"home");
-    initMenuButton( reinterpret_cast<ShopScene*>(0),"shop");
-    //initMenuButton("shop","shop/ShopScene.csb");
-    initMenuButton( reinterpret_cast<VisualScene*>(0),"dictionary");
-    //initMenuButton("battle","battle/BattleScene.csb");
     
     auto ui_layer = _scene->getChildByName("ProductsTopMenu");
     
@@ -149,9 +124,9 @@ void ShopScene::setProducts(PRODUCTS identify){
     
     if(!_right_arrow && !_left_arrow){
         _right_arrow = Sprite::create("utility/utility_ui.png",
-                                      Rect(params::L_ARROW_X,params::L_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+                                      Rect(params::R_ARROW_X,params::R_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
         _left_arrow = Sprite::create("utility/utility_ui.png",
-                                     Rect(params::R_ARROW_X,params::R_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
+                                     Rect(params::L_ARROW_X,params::L_ARROW_Y,params::UTILITY_SIZE,params::UTILITY_SIZE));
         
         addChild(_left_arrow,UI,"l_arrow");
         addChild(_right_arrow,UI,"r_arrow");

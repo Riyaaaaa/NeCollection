@@ -15,9 +15,9 @@ enum params{
     NUMBER_OF_PRODUCT_TYPES=4,
     UTILITY_SIZE = 50,
     VISUAL_CONTENTS_SIZE=200,
-    L_ARROW_X = 0,
+    L_ARROW_X = 50,
     L_ARROW_Y = 0,
-    R_ARROW_X = 50,
+    R_ARROW_X = 00,
     R_ARROW_Y = 0,
     ALERT_X = 150,
     ALERT_Y = 0

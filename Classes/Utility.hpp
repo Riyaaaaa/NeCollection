@@ -29,10 +29,9 @@ template<int Digit=2>
 std::string fill_zero(int id){
     std::string result;
     for(int i=Digit-1; i>=0; i--){
-        if( 1 <= id / pow(10,i))break;
-        else result.push_back('0');
+        result.push_back( '0' + (id / pow(10,i) ) );
+        id = id % static_cast<int>(std::pow(10,i));
     }
-    result += std::to_string(id);
     return result;
 }
 

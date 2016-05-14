@@ -24,7 +24,6 @@ class SellContainer;
 class ShopScene : public MainScene
 {
 public:
-    static cocos2d::Scene* createScene();
     
     virtual bool init();
     

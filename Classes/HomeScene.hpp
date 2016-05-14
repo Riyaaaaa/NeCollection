@@ -20,7 +20,6 @@
 class HomeScene : public MainScene
 {
 public:
-    static cocos2d::Scene* createScene();
     void refreshScene();
     
     virtual bool init();
@@ -44,6 +43,7 @@ protected:
     };
 
     cocos2d::Sprite* _home_bg;
+    cocos2d::Node* _redecorate_window;
     
     dbIO* _db;
     
@@ -52,7 +52,7 @@ protected:
     std::array< CatObjectStatus, params::NUMBER_OF_PRODUCT_TYPES > _cat_object_status;
     
     void setEnableCatObject(bool,PRODUCTS);
-    
+    void setCatObject(PRODUCTS product,int id);
     
     bool initStatus();
     bool initUI();
@@ -61,7 +61,7 @@ protected:
     void getCat(int id);
     
     void replaceSceneWithName(std::string);
-    void setCatObject(PRODUCTS product,int id);
+    void setRedecorateWindow();
     
     void update(float dt);
     int lotteryCat();

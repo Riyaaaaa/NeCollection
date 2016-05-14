@@ -110,7 +110,7 @@ void AppDelegate::applicationDidEnterBackground() {
 }
 
 void AppDelegate::launchGame(){
-    auto scene = HomeScene::createScene();
+    auto scene = HomeScene::create();
     Director::getInstance()->replaceScene(scene);
 }
 

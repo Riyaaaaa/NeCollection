@@ -52,7 +52,6 @@ bool TitleScene::init()
 
 void TitleScene::beginAnimation(){
     
-    
     cocos2d::Node* neko = _titlescene->getChildByName("neko");
     
     Animation *animation = Animation::create();

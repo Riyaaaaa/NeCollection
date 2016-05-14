@@ -31,18 +31,10 @@
     <Item Key="TabsParamsKey">
       <Value ctype="TabsInfo">
         <OpenedDocuments>
-          <FilePathData Path="shop/Buy_Window.csd" />
-          <FilePathData Path="UI/sell_window.csd" />
-          <FilePathData Path="dictionary/VisualCat.csd" />
-          <FilePathData Path="dictionary/VisualScene.csd" />
-          <FilePathData Path="TitleScene.csd" />
-          <FilePathData Path="box/BoxLayer.csd" />
-          <FilePathData Path="UI/Title.csd" />
-          <FilePathData Path="UI/Confirm_Window.csd" />
-          <FilePathData Path="UI/Redecoration_Window.csd" />
+          <FilePathData Path="home/Redecorate_Window.csd" />
           <FilePathData Path="home/HomeScene.csd" />
         </OpenedDocuments>
-        <ActiveDocument Path="home/HomeScene.csd" />
+        <ActiveDocument Path="home/Redecorate_Window.csd" />
       </Value>
     </Item>
   </Properties>

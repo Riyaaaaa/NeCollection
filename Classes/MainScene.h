@@ -11,7 +11,7 @@
 
 #include "cocos2d.h"
 
-class MainScene: public cocos2d::Layer{
+class MainScene: public cocos2d::Scene{
 public:
     virtual bool init(std::string);
     virtual ~MainScene()=default;
