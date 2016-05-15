@@ -9,7 +9,7 @@
 #ifndef SingletonBase_h
 #define SingletonBase_h
 
-template<Extend>
+template<class Extend>
 class SingletonBase {
 protected:
     static Extend* _singletonInstancePointer;
@@ -19,7 +19,7 @@ protected:
 public:
     static Extend* getInstance() {
         if(_singletonInstancePointer) {
-            _singletonInstancePointer = new _singletonInstancePointer;
+            _singletonInstancePointer = new Extend;
         }
         return _singletonInstancePointer;
     }
@@ -31,8 +31,8 @@ public:
     }
 };
 
-template<Extend>
-SingletonBase<Extend>::_singletonInstancePointer = nullptr;
+template<class Extend>
+Extend* SingletonBase<Extend>::_singletonInstancePointer = nullptr;
 
 
 #endif /* SingletonBase_h */

@@ -20,11 +20,16 @@
 class HomeScene : public MainScene
 {
 public:
-    void refreshScene();
+    void onEnter() override;
+    void onExit() override;
     
-    virtual bool init();
+    enum class EventType {
+        OCCURED_EVENT_TIME
+    };
     
-    ~HomeScene();
+    virtual bool init() override;
+    
+    ~HomeScene() = default;
     
     // implement the "static create()" method manually
     CREATE_FUNC(HomeScene);
@@ -34,8 +39,12 @@ public:
     void onTouchEnded(cocos2d::Touch*,cocos2d::Event*);
     void onTouchCancelled(cocos2d::Touch*,cocos2d::Event*);
     
-    void saveScheduleTime();
-    void saveObjectStatus();
+    std::array< CatObjectStatus, params::NUMBER_OF_PRODUCT_TYPES >& getCatObjectStatuses() { return _cat_object_status; }
+    std::vector<cocos2d::ui::Button*>& getCatObjectButtons() { return _cat_objects; };
+    
+    void setCatObjectCallback(std::function<void(Ref*)> callback, PRODUCTS product);
+    
+    CC_SYNTHESIZE(std::function<void(EventType)>, _callback, EventCallBack);
     
 protected:
     enum ZOrder{
@@ -51,20 +60,15 @@ protected:
     std::vector<cocos2d::ui::Button*> _cat_objects;
     std::array< CatObjectStatus, params::NUMBER_OF_PRODUCT_TYPES > _cat_object_status;
     
-    void setEnableCatObject(bool,PRODUCTS);
     void setCatObject(PRODUCTS product,int id);
     
     bool initStatus();
     bool initUI();
     
-    void comeCat();
-    void getCat(int id);
-    
     void replaceSceneWithName(std::string);
     void setRedecorateWindow();
     
-    void update(float dt);
-    int lotteryCat();
+    void update(float dt) override;
     
     int _remain_event_time=600;
     cocos2d::Vec2 _old_pos;

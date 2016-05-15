@@ -48,3 +48,7 @@ bool MainScene::init(std::string filename){
     initMainMenu();
     return true;
 }
+
+void MainScene::onExit() {
+    
+}

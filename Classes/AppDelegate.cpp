@@ -98,11 +98,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void AppDelegate::applicationDidEnterBackground() {
     
-    auto* running_scene = Director::getInstance()->getRunningScene()->getChildren().at(1);
-    if(running_scene->getName() == "HomeScene"){
-        dynamic_cast<HomeScene*>(running_scene)->saveScheduleTime();
-    }
-    
     Director::getInstance()->stopAnimation();
     
     // if you use SimpleAudioEngine, it must be pause
@@ -116,12 +111,6 @@ void AppDelegate::launchGame(){
 
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
-    
-    auto* running_scene = Director::getInstance()->getRunningScene()->getChildren().at(1);
-    if(running_scene->getName() == "HomeScene"){
-        dynamic_cast<HomeScene*>(running_scene)->refreshScene();
-    }
-    
     Director::getInstance()->startAnimation();
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();

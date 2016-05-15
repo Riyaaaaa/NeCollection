@@ -15,6 +15,8 @@ class MainScene: public cocos2d::Scene{
 public:
     virtual bool init(std::string);
     virtual ~MainScene()=default;
+    
+    void onExit() override;
 protected:
     bool initMainMenu();
     cocos2d::Node* _scene;
